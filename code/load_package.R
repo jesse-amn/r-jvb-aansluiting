@@ -14,7 +14,7 @@ install.packages(getwd(),
 # Load package ####
 library(aansluiting)
 
-## Test function ####
+# Test function ####
 hello()
 
 # Document roxygen2 changes in ./man based on ./R ####
