@@ -1,0 +1,10 @@
+@page  {
+  @bottom-center {
+    content: counter(page);
+    font-family: Arial;
+    font-size: 10pt;
+    color: grey;
+    
+  }
+}
+

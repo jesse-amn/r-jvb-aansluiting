@@ -1,0 +1,130 @@
+body{
+  font-family: "Arial";
+  font-size: 10pt;
+  line-height: 15pt;
+}
+h1{
+  font-family: "Arial";
+  font-size: 37pt;
+  font-weight: normal;
+  color: #FC3634;
+  line-height: 47pt;
+}
+h2{
+  font-family: "Arial";
+  font-size: 28pt;
+  font-weight: normal;
+  color: #FF9D1B;
+  line-height: 35pt;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+h3{
+  font-family: "Arial";
+  font-size: 28pt;
+  font-weight: normal;
+  color: #FC3634;
+  line-height: 35pt;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+h4{
+  font-family: "Arial";
+  font-size: 19pt;
+  font-weight: normal;
+  color: #FF9D1B;
+  line-height: 25pt;
+  margin-top: 30pt;
+  margin-bottom: 0;
+}
+h5{
+  font-family: "Arial";
+  font-size: 12pt;
+  font-weight: normal;
+  color: #FF9D1B;
+  margin-top: 18pt;
+  margin-bottom: 0;
+}
+
+
+
+.body{
+   font: 11pt "Arial";
+   line-height: 12px;
+}
+.body2{
+   font: 11pt "Arial";
+   line-height: 20px;
+}
+.friso{
+   font: 10pt "Arial";
+   line-height: 22px;
+}
+.subtitle{
+   font: 11pt "Arial";
+}
+.titleText {
+  font: 15pt "Arial";
+  line-height: 15px;
+}
+
+.titleText2 {
+  font: 40pt "Arial";
+}
+.orange {
+  color: #FF9D1B;
+}
+.red {
+  color: #FC3634;
+}
+.row {
+ width: 100%;
+}
+.columnLeft {
+  float: left;
+  padding: 5px;
+  width: 65%;
+}
+
+.columnRight {
+  float: left;
+  padding: 100px 5px 5px 30px;
+  width: 35%;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+table {
+  width: 100%;
+  margin: auto;
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  border-collapse: collapse;
+  font: 9pt "Arial";
+  margin-bottom: 20px;
+  margin-left: 0px;
+  
+}
+table thead th {
+  background-color: #FF9D1B;
+  color: white;
+  font: 10pt "Arial"
+}
+
+th {
+  border-top: solid 0.5pt #FF9D1B;
+  padding: 2px;
+  line-height: 12px;
+}
+
+td {
+  border-bottom: solid 0.5pt #bfbfbf;
+  background-color: white;
+  padding: 2px;
+  line-height: 12px;
+}
+
