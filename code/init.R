@@ -11,6 +11,10 @@ initially, the directory name should be the same as the package name. However, t
 also means that the package name must contain no special characters or spaces at
 initialization. The package name can be changed later, but this will require
 additional steps.
+
+After initialization, DESCRIPTION information can be changed, and the
+directory name can be changed. This will not affect the package loading name,
+which can be found in ./DESCRIPTION -> package -> name.
 "
 # Environment Set-up ####
 library(here)

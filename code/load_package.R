@@ -8,11 +8,11 @@ dir.create(templib)
 
 # Install package ####
 install.packages(getwd(),
-                 lib = templib, type = "source", repos = NULL
+  lib = templib, type = "source", repos = NULL
 )
 
 # Load package ####
-library(package_name)
+library(aansluiting)
 
 ## Test function ####
 hello()

@@ -1,4 +1,4 @@
-#' Hello World Function
+#' Hello Function
 #'
 #' This function prints 'Hello, World!' to the console.
 #'
@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-#' hello_world()
-hello_world <- function() {
-  message('Hello, World!')
+#' hello()
+hello <- function() {
+  print("Hello, World!")
 }
