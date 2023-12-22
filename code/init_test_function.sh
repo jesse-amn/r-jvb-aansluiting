@@ -2,7 +2,7 @@
 
 # Write the content to hello.R
 cat <<EOF >./R/hello.R
-#' Hello World Function
+#' Hello Function
 #'
 #' This function prints 'Hello, World!' to the console.
 #'
@@ -10,7 +10,7 @@ cat <<EOF >./R/hello.R
 #' @export
 #'
 #' @examples
-#' hello_world()
+#' hello()
 hello_world <- function() {
   message('Hello, World!')
 }
