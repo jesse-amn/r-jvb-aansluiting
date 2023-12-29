@@ -18,6 +18,7 @@ Table of Contents:
   8 . File Report:         Notations, comments, and references
 "
 
+
 # Environment Set-up ####
 ##  General ####
 library(here)
@@ -31,7 +32,7 @@ if (any(grepl("/", list.files(recursive = TRUE, pattern = "amn_helpers.R")))) {
 }
 
 ## Load necessary packages: Fill into c() with comma-seperated quotation marks ####
-packages <- c("readr", "psych")
+packages <- c("readr", "psych", "parallel", "foreach")
 pkg_loader(packages)
 rm(packages)
 
@@ -39,17 +40,21 @@ rm(packages)
 wd_set_current()
 
 ## Create script-specific functions
-create_cfa_model <- function(df) {
+
+create_cfa_model <- function(df, n_factors = NULL) {
+  if (is.null(n_factors)) {
+    n_factors <- 1
+  }
   variables <- colnames(df[, !grepl("package_duration|student_number|student_name|birth_date", colnames(df))])
-  # Create a string for the model
-  model_string <- paste(variables, collapse = " + ")
 
-  # Create the lavaan model syntax
-  cfa_model <- paste("f =~", model_string)
-
+  cfa_model <- ""
+  for (f in 1:n_factors) {
+    # Create the lavaan model syntax with two new lines
+    model <- paste0("f", f, " =~ ", paste(variables, collapse = " + "), "\n\n")
+    cfa_model <- paste0(cfa_model, model)
+  }
   return(cfa_model)
 }
-
 
 
 # Data Importation ####
@@ -75,10 +80,12 @@ data_frames <- sapply(initial_env, function(x) {
 })
 
 ### Filter names ####
-names <- initial_env[data_frames]
-names <- names[!grepl("meta_df|metenenmeetkunde|woordenrelateren", names)]
-# names <- names[!grepl("meta|metenenmeetkunde|woordenrelateren", names)] # TODO: these did not work yet.
-names
+data_frame_names <- initial_env[data_frames]
+data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|woordenrelateren|gedrag|interesse", data_frame_names)]
+
+# Remove df from recommended_factors if it exists
+data_frame_names <- setdiff(data_frame_names, c("recommended_factors", "local_df"))
+
 ## Create Subdirectories ####
 ### Create subdirectory named "item_analyses<year>" in ./data ####
 subdirectory <- paste0("./data/factor_analyses", format(Sys.Date(), "%Y"))
@@ -88,30 +95,33 @@ dir.create(subdirectory)
 graph_subdirectory <- paste0(subdirectory, "/fa_graphs")
 dir.create(graph_subdirectory)
 
-## Create df to hold recommended factors
-# Create empty data frame
+## Create df to hold recommended factors ####
+### Create empty data frame ####
 recommended_factors <- data.frame(
-  name = character(length(names)),
-  scree_fa = numeric(length(names)),
-  scree_pc_eigen = numeric(length(names)),
-  parallel = numeric(length(names))
+  name = character(length(data_frame_names)),
+  scree_fa = numeric(length(data_frame_names)),
+  scree_pc_eigen = numeric(length(data_frame_names)),
+  parallel = numeric(length(data_frame_names))
 )
 
-# Assign values to the data frame
-recommended_factors$name <- names
+### Assign values to the data frame ####
+recommended_factors$name <- data_frame_names
 recommended_factors$scree_fa <- NA
 recommended_factors$scree_pc_eigen <- NA
 recommended_factors$parallel <- NA
 
 
+
+
+
 # Data Analyses - Main ####
 ## Factor Analyses ####
-for (df in names) {
+for (df in data_frame_names) {
   # Print df name
   print(df)
 
   # Append name to recommended_factors
-  recommended_factors$name[which(names == df)] <- df
+  recommended_factors$name[which(data_frame_names == df)] <- df
 
   # Create list to save factor analyses
   factor_analyses <- list()
@@ -123,51 +133,56 @@ for (df in names) {
   local_df <- local_df[
     , !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))
   ]
+  # Remove items with extreme missingness.
+  local_df <- local_df[
+    , !grepl("ASL_componenten_21|ASL_componenten_11", colnames(local_df))
+  ]
 
-  # Remove empty rows
-  local_df <- local_df[complete.cases(local_df), ]
-
+  # Remove empty variables
+  local_df <- local_df[, colSums(is.na(local_df)) != nrow(local_df)]
+  summary(local_df)
   # Remove variables with exactly 0 standard deviation
-  local_df <- local_df[, apply(local_df, 2, sd) != 0]
+  local_df <- local_df[, apply(local_df, 2, sd, na.rm = TRUE) != 0]
+
+  # Replace "Invalid Number" with NA
+  local_df <- replace(local_df, local_df == "Invalid Number", NA)
+
+  # Create lavaan model for 1-factor CFA
+  model <- create_cfa_model(local_df)
 
   # Save factor analyses to list
   # Orthogonal rotation: factors assumed to be uncorrelated
-  factor_analyses[[paste0(df, "_obli")]] <- fa(local_df, 1, rotate = "varimax")
+  factor_analyses[[paste0(df, "_obli")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "varimax")
 
   # Oblique rotation:factors assumed to be correlated
-  factor_analyses[[paste0(df, "_orth")]] <- fa(local_df, 1, rotate = "promax")
+  factor_analyses[[paste0(df, "_orth")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "promax")
 
-  # Null-factor eigen_values
-  factor_analyses[[paste0(df, "_ev")]] <- eigen(cor(local_df))$values
 
   # Data Exportation ####
+  # Create and save plots as pngs
+  # Simple Scree plot
+  png(file = paste0(graph_subdirectory, "/", df, "_scree_plot.png"))
+  scree_plot <- scree(local_df, pc = TRUE)
+  recommended_factors$scree_fa[which(data_frame_names == df)] <- sum(scree_plot$fv >= 1)
+  recommended_factors$scree_pc_eigen[which(data_frame_names == df)] <- sum(scree_plot$pcv >= 1)
+  factor_analyses[[paste0(df, "_ev")]] <- scree_plot$pcv
+  dev.off()
+
+  # Scree plot parallel analysis
+  png(file = paste0(graph_subdirectory, "/", df, "_parallel_plot.png"))
+  scree_parallel_plot <- fa.parallel(local_df, fa = "fa")
+  recommended_factors$parallel[which(data_frame_names == df)] <- scree_parallel_plot$nfact
+  dev.off()
+
   # Save factor analyses results as Rdata
   save(
     factor_analyses,
     file = paste0(subdirectory, "/", df, ".Rdata")
   )
 
-  # Create and save plots as pngs
-  # Simple Scree plot
-  png(file = paste0(graph_subdirectory, "/", df, "_scree_plot.png"))
-  scree_plot <- scree(local_df, pc = TRUE)
-  recommended_factors$scree_fa[which(names == df)] <- sum(scree_plot$fv >= 1)
-  recommended_factors$scree_pc_eigen[which(names == df)] <- sum(scree_plot$pcv >= 1)
-  dev.off()
-
-  # Scree plot parallel analysis
-  png(file = paste0(graph_subdirectory, "/", df, "_parallel_plot.png"))
-  scree_parallel_plot <- fa.parallel(local_df, fa = "fa")
-  recommended_factors$parallel[which(names == df)] <- scree_parallel_plot$nfact
-  dev.off()
-
   # Remove df from global environment
-  # rm(list = df, envir = .GlobalEnv)
   # rm(scree_plot, scree_parallel_plot)
 }
-
-
-
 
 
 # create subdirectory for alternative factor analyses
@@ -177,7 +192,7 @@ dir.create(alt_fac_name)
 # get lowest recommended factors
 recommended_factors$lowest <- apply(recommended_factors[, -1], 1, min)
 write.csv(recommended_factors, paste0("./data/factor_analyses", format(Sys.Date(), "%Y"), "/recommended_factors.csv"))
-
+recommended_factors
 # run factor analyses with lowest recommended factors
 for (df in recommended_factors$name[recommended_factors$lowest != 1]) {
   # Print df name
@@ -195,21 +210,21 @@ for (df in recommended_factors$name[recommended_factors$lowest != 1]) {
     !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))
   ]
 
-  # Remove empty rows
-  local_df <- local_df[complete.cases(local_df), ]
+  # Remove empty variables
+  local_df <- local_df[, colSums(is.na(local_df)) != nrow(local_df)]
 
   # Remove variables with exactly 0 standard deviation
-  local_df <- local_df[, apply(local_df, 2, sd) != 0]
+  local_df <- local_df[, apply(local_df, 2, sd, na.rm = TRUE) != 0]
+
+  # Create lavaan model for 3-factor CFA
+  model <- create_cfa_model(local_df, n_factors = 3)
 
   # Save factor analyses to list
   # Orthogonal rotation: factors assumed to be uncorrelated
-  factor_analyses[[paste0(df, "_obli")]] <- fa(local_df, recommended_factors$lowest[recommended_factors$name == df], rotate = "promax")
+  factor_analyses[[paste0(df, "_obli")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "varimax")
 
-  # Oblique rotation:factors assumed to be correlated
-  factor_analyses[[paste0(df, "_orth")]] <- fa(local_df, recommended_factors$lowest[recommended_factors$name == df], rotate = "varimax")
-
-  # Null-factor eigen_values
-  factor_analyses[[paste0(df, "_ev")]] <- eigen(cor(local_df))$values
+  # Oblique rotation: factors assumed to be correlated
+  factor_analyses[[paste0(df, "_orth")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "promax")
 
   # Data Exportation ####
   # Save factor analyses results as Rdata
@@ -224,7 +239,7 @@ rm(list = ls())
 
 
 
-
+df
 
 
 

@@ -62,7 +62,7 @@ rm(df)
 
 ## Metadata ####
 meta_df <- read.csv("./data/data_input/meta_file.csv")
-file_list
+
 
 # Data Preparation ####
 ## Main data ####
@@ -78,10 +78,10 @@ for (name in basename(file_list) %>% gsub(".csv", "", .)) {
   df <- df[, colSums(!is.na(df)) > 0]
 
   # Remove completely empty rows
-  df <- df[complete.cases(df), ]
+  df <- df[rowSums(is.na(df)) != ncol(df), ]
 
   # Remove ".SCORE" from column names
-  colnames(df) <- gsub("_item.SCORE|_item.SCORES|intro_prac|_wrong", "", colnames(df))
+  colnames(df) <- gsub("_item.SCORE|_item.SCORES|intro_prac|intro_info|_wrong", "", colnames(df))
 
   assign(name, df, envir = .GlobalEnv)
 }
@@ -91,7 +91,13 @@ rm(name, df)
 if (item_analyses == TRUE) {
   save_all_dfs("./data/data_interrim")
   rm(list = ls())
+
+  sink("/dev/null")
   source(paste0("./R/code_extra/factor_analyses.R"), echo = FALSE)
+  sink()
+  sink("/dev/null")
+  source(paste0("./R/code_extra/factor_analyses_simple.R"), echo = FALSE)
+  sink()
 }
 
 
