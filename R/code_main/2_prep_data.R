@@ -23,6 +23,8 @@ Table of Contents:
   9. File Report:         Notations, comments, and references
 
 "
+item_analyses <- TRUE
+
 
 # Environment Set-up ####
 ##  General ####
@@ -60,11 +62,12 @@ rm(df)
 
 ## Metadata ####
 meta_df <- read.csv("./data/data_input/meta_file.csv")
-
+file_list
 
 # Data Preparation ####
 ## Main data ####
 for (name in basename(file_list) %>% gsub(".csv", "", .)) {
+  print(name)
   # get df localy
   df <- get(name)
 
@@ -77,9 +80,56 @@ for (name in basename(file_list) %>% gsub(".csv", "", .)) {
   # Remove completely empty rows
   df <- df[complete.cases(df), ]
 
+  # Remove ".SCORE" from column names
+  colnames(df) <- gsub("_item.SCORE|_item.SCORES|intro_prac|_wrong", "", colnames(df))
+
   assign(name, df, envir = .GlobalEnv)
 }
-rm(file_list, name, df)
+rm(name, df)
+
+
+if (item_analyses == TRUE) {
+  save_all_dfs("./data/data_interrim")
+  rm(list = ls())
+  source(paste0("./R/code_extra/factor_analyses.R"), echo = FALSE)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+missing_rows <- data.frame()
+percentage_threshold <- 0.2 # Change this value to your desired percentage threshold
+
+for (name in basename(file_list) %>% gsub(".csv", "", .)) {
+  df <- get(name)
+  missing_count <- sum(rowSums(is.na(df)) > ncol(df) * percentage_threshold)
+  total_rows <- nrow(df)
+  percentage_missing <- missing_count / total_rows * 100
+  missing_rows <- rbind(missing_rows, data.frame(Dataframe = name, MissingRows = missing_count, PercentageMissing = percentage_missing))
+}
+missing_rows
+
+missing_columns <- data.frame()
+percentage_threshold <- 0.7 # Change this value to your desired percentage threshold
+
+for (name in basename(file_list) %>% gsub(".csv", "", .)) {
+  df <- get(name)
+  missing_count <- sum(colSums(is.na(df)) > nrow(df) * percentage_threshold)
+  total_columns <- ncol(df)
+  percentage_missing <- missing_count / total_columns * 100
+  missing_columns <- rbind(missing_columns, data.frame(Dataframe = name, MissingColumns = missing_count, PercentageMissing = percentage_missing, ColumnNames = paste(colnames(df)[colSums(is.na(df)) > nrow(df) * percentage_threshold], collapse = ", ")))
+}
+missing_columns
+
 
 ## Metadata ####
 meta_df <- meta_df[, c(
@@ -91,6 +141,6 @@ meta_df <- meta_df[, c(
 save_all_dfs("./data/data_interrim")
 
 # Script Clean-up ####
-
+rm(list = ls())
 
 # File Report ####
