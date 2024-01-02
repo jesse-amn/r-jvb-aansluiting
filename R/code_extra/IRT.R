@@ -1,0 +1,196 @@
+# File Documentation ####
+"
+Author description:
+
+Project description:
+
+File description:
+
+Table of Contents:
+  1. File Documentation:  Script purpose and explanation
+  2. Environment Set-up:  Options, directories, packages, and functions
+  3. Data Importation:    Loading and formatting of data
+  4. Data Preparation:    Change and transformation of data
+  5. Data Analyses:
+    1. Exploration:         Descriptives, missingness, and outliers
+    2. Preparation:         Assumptions,
+    3. Main:                Model creation and execution
+    4. Interpretation:      Significance, fit, and relations
+    5. Explication:         Graphs and tables
+  6. Data Finalization:   Preparation and combination of export products
+  7. Data Exportation:    Exportation of final data and related products
+  8. Script Clean-up:     Object removal and process terminations
+  9. File Report:         Notations, comments, and references
+"
+
+# Environment Set-up ####
+##  General ####
+library(here)
+options(scipen = 999, repos = c(CRAN = "https://cloud.r-project.org/"))
+
+## Get helpers ####
+if (any(grepl("/", list.files(recursive = TRUE, pattern = "amn_helpers.R")))) {
+  source(here(list.files(recursive = TRUE, pattern = "amn_helpers.R")))
+} else {
+  source(list.files(recursive = TRUE, pattern = "amn_helpers.R"))
+}
+
+## Load necessary packages: Fill into c() with comma-seperated quotation marks ####
+packages <- c("readr", "mirt", "dplyr", "ggplot2", "randomcoloR")
+pkg_loader(packages)
+rm(packages)
+
+## Load devtools package ####
+if (!requireNamespace("ggmirt", quietly = TRUE)) {
+  devtools::install_github("masurp/ggmirt")
+}
+library(ggmirt)
+
+## Change directory: if not .Rproj, it will set working directory to script filepath ####
+wd_set_current()
+
+## Set seed ####
+set.seed(42)
+
+
+# Data Importation ####
+## Get data
+for (df in list.files("./data/data_interrim", pattern = ".csv", full.names = TRUE)) {
+  assign(
+    gsub("./data/data_interrim/", "", gsub(".csv", "", df)),
+    read_csv(df)
+  )
+  rm(df)
+}
+initial_env <- ls(envir = .GlobalEnv)
+
+### Get the names of the data frames ####
+data_frames <- sapply(initial_env, function(x) {
+  classes <- class(get(x, envir = .GlobalEnv))
+  any(grepl("spec_tbl_df|tbl_df|tbl|data.frame", classes))
+})
+
+### Filter names ####
+data_frame_names <- initial_env[data_frames]
+data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|gedrag_houding|interesse", data_frame_names)]
+data_frame_names <- data_frame_names[data_frame_names != "local_df" & data_frame_names != "recommended_factors"]
+
+
+## Create Subdirectories ####
+### Create subdirectory named "item_analyses<year>" in ./data ####
+subdirectory <- paste0("./data/irt_analyses", format(Sys.Date(), "%Y"))
+dir.create(subdirectory)
+
+### Create subdirectory named "fa_graphs" in ./data/factor_analyses_simple<year> ####
+graph_subdirectory <- paste0(subdirectory, "/irt_graphs")
+dir.create(graph_subdirectory)
+
+
+
+# Data Preparation ####
+irt_fits <- list() # Create an empty list to store the irt_fit objects
+
+for (df in data_frame_names) {
+  print(df)
+  ## Get and filter data ####
+  local_df <- get(df)
+  local_df <- local_df[, !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))]
+
+  irt_fit <- mirt(
+    data = local_df,
+    model = 1, # Number of factors
+    method = "EM", # can be changed: MCEM (monte-carlo EM)
+    itemtype = "2PL", # can be changed: RASCH, 3PL
+    verbose = TRUE,
+    emcycles = 500 # Increase the maximum number of EM cycles to N
+  )
+  irt_fits[[df]] <- irt_fit # Store the irt_fit object in the list
+  saveRDS(irt_fit, file = paste0("./data/irt_analyses_", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
+}
+
+
+for (i in seq_along(irt_fits)) {
+  print(i)
+  fit <- irt_fits[[i]]
+  #print(fit)
+  params <- coef(fit, IRTpars = TRUE, simplify = TRUE)
+  "
+  # Item characteristics curves
+  tracePlot(irt_fit)
+
+  itempersonMap(irt_fit)
+  "
+}
+
+
+# Data Analyses - Main ####
+fit
+
+
+
+
+
+
+summary(irt_fit)
+
+params <- coef(fit, IRTpars = TRUE, simplify = TRUE)
+round(params$items, 2) # g = c = guessing parameter
+params
+# Model fit
+M2(irt_fit)
+
+# item fit
+itemfit(irt_fit)
+itemfitPlot(irt_fit)
+
+# person fit
+head(personfit(irt_fit))
+
+personfit(irt_fit) %>%
+  reframe(
+    infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+    outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+  ) # lower row = non-fitting people
+
+
+
+# Item characteristics curves
+tracePlot(irt_fit)
+
+
+# Data Analyses - Explication ####
+install.packages("randomcoloR")
+library(randomcoloR)
+params$items
+tracePlot(fit, facet = FALSE, legend = TRUE) +
+  scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+
+tracePlot(irt_fit, items = c(1:5), facet = FALSE, legend = TRUE) +
+  scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+
+# Item info curve
+itemInfoPlot(irt_fit, legend = TRUE) +
+  scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+itemInfoPlot(irt_fit, facet = TRUE)
+
+# Test information curve
+testInfoPlot(irt_fit, adj_factor = 2)
+
+scaleCharPlot(irt_fit)
+
+
+
+
+
+
+
+# Data Finalization ####
+
+
+# Data Exportation ####
+
+
+# Script Clean-up ####
+
+
+# File Report ####

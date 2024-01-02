@@ -26,6 +26,8 @@ Table of Contents:
 item_analyses <- TRUE
 
 
+# TODO: Meetenmeetkunde
+
 # Environment Set-up ####
 ##  General ####
 library(here)
@@ -73,6 +75,7 @@ for (name in basename(file_list) %>% gsub(".csv", "", .)) {
 
   # filter df
   df <- df[, grepl("student_name|birth_date|student_number|package_origin|package_duration_raw|item.SCORE", colnames(df))]
+  df <- df[, !grepl("intro_prac|intro_info|_wrong", colnames(df))]
 
   # Remove completely empty columns
   df <- df[, colSums(!is.na(df)) > 0]
@@ -81,11 +84,36 @@ for (name in basename(file_list) %>% gsub(".csv", "", .)) {
   df <- df[rowSums(is.na(df)) != ncol(df), ]
 
   # Remove ".SCORE" from column names
-  colnames(df) <- gsub("_item.SCORE|_item.SCORES|intro_prac|intro_info|_wrong", "", colnames(df))
+  colnames(df) <- gsub("_item.SCORE|_item.SCORES", "", colnames(df))
 
   assign(name, df, envir = .GlobalEnv)
 }
 rm(name, df)
+
+# NA was used for wrong. Replace with 0
+woordenrelateren[is.na(woordenrelateren)] <- 0
+sommenmaken$ASL_sommenmaken_012_NEW[is.na(sommenmaken$ASL_sommenmaken_012_NEW)] <- 0
+
+
+'
+colnames(metenenmeetkunde)
+summary(metenenmeetkunde)
+head(metenenmeetkunde)
+# Count occurrences of 0s and 1s for specific variables in metenenmeetkunde
+test <- metenenmeetkunde
+df <- metenenmeetkunde[, grepl("0F_007", colnames(metenenmeetkunde))]
+
+count_table <- data.frame(variable = character(), zeros = integer(), ones = integer(), stringsAsFactors = FALSE)
+for (variable in colnames(df)) {
+  count <- table(df[[variable]])
+  zeros <- count[["0"]]
+  ones <- count[["1"]]
+  count_table <- rbind(count_table, data.frame(variable = variable, zeros = zeros, ones = ones))
+}
+
+
+
+'
 
 
 if (item_analyses == TRUE) {
@@ -93,14 +121,13 @@ if (item_analyses == TRUE) {
   rm(list = ls())
 
   sink("/dev/null")
-  source(paste0("./R/code_extra/factor_analyses.R"), echo = FALSE)
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/factor_analyses.R"), echo = FALSE)))
   sink()
+
   sink("/dev/null")
-  source(paste0("./R/code_extra/factor_analyses_simple.R"), echo = FALSE)
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/factor_analyses_simple.R"), echo = FALSE)))
   sink()
 }
-
-
 
 
 

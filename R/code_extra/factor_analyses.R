@@ -32,7 +32,7 @@ if (any(grepl("/", list.files(recursive = TRUE, pattern = "amn_helpers.R")))) {
 }
 
 ## Load necessary packages: Fill into c() with comma-seperated quotation marks ####
-packages <- c("readr", "psych", "parallel", "foreach")
+packages <- c("readr", "psych", "lavaan")
 pkg_loader(packages)
 rm(packages)
 
@@ -41,18 +41,11 @@ wd_set_current()
 
 ## Create script-specific functions
 
-create_cfa_model <- function(df, n_factors = NULL) {
-  if (is.null(n_factors)) {
-    n_factors <- 1
-  }
+create_cfa_model <- function(df) {
   variables <- colnames(df[, !grepl("package_duration|student_number|student_name|birth_date", colnames(df))])
 
-  cfa_model <- ""
-  for (f in 1:n_factors) {
-    # Create the lavaan model syntax with two new lines
-    model <- paste0("f", f, " =~ ", paste(variables, collapse = " + "), "\n\n")
-    cfa_model <- paste0(cfa_model, model)
-  }
+  cfa_model <- paste0("f1", " =~ ", paste(variables, collapse = " + "))
+
   return(cfa_model)
 }
 
@@ -81,7 +74,7 @@ data_frames <- sapply(initial_env, function(x) {
 
 ### Filter names ####
 data_frame_names <- initial_env[data_frames]
-data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|woordenrelateren|gedrag|interesse", data_frame_names)]
+data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|gedrag|interesse", data_frame_names)]
 
 # Remove df from recommended_factors if it exists
 data_frame_names <- setdiff(data_frame_names, c("recommended_factors", "local_df"))
@@ -140,7 +133,7 @@ for (df in data_frame_names) {
 
   # Remove empty variables
   local_df <- local_df[, colSums(is.na(local_df)) != nrow(local_df)]
-  summary(local_df)
+
   # Remove variables with exactly 0 standard deviation
   local_df <- local_df[, apply(local_df, 2, sd, na.rm = TRUE) != 0]
 
@@ -152,10 +145,10 @@ for (df in data_frame_names) {
 
   # Save factor analyses to list
   # Orthogonal rotation: factors assumed to be uncorrelated
-  factor_analyses[[paste0(df, "_obli")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "varimax")
+  factor_analyses[[paste0(df, "_obli")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "varimax", std.lv = TRUE)
 
   # Oblique rotation:factors assumed to be correlated
-  factor_analyses[[paste0(df, "_orth")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "promax")
+  factor_analyses[[paste0(df, "_orth")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "promax", std.lv = TRUE)
 
 
   # Data Exportation ####
@@ -192,7 +185,31 @@ dir.create(alt_fac_name)
 # get lowest recommended factors
 recommended_factors$lowest <- apply(recommended_factors[, -1], 1, min)
 write.csv(recommended_factors, paste0("./data/factor_analyses", format(Sys.Date(), "%Y"), "/recommended_factors.csv"))
-recommended_factors
+
+
+# Create multi-factor lavaan models.
+for (factor in recommended_factors$name[recommended_factors$lowest > 1]) {
+  print(factor)
+  print(recommended_factors$lowest[recommended_factors$name == factor])
+
+  # Get df locally
+  local_df <- get(factor)
+
+  # Empty model
+  model <- ""
+  for (f in 1:recommended_factors$lowest[recommended_factors$name == factor]) {
+    # Create the lavaan model syntax with two new lines
+    int_model <- create_cfa_model(local_df)
+    substr(int_model, 2, 2) <- as.character(f)
+    int_model <- paste0(int_model, "\n\n")
+
+    model <- paste0(model, int_model)
+  }
+  assign(paste0(factor, "_model"), model, envir = .GlobalEnv)
+  rm(factor, f, int_model, model)
+}
+
+
 # run factor analyses with lowest recommended factors
 for (df in recommended_factors$name[recommended_factors$lowest != 1]) {
   # Print df name
@@ -217,14 +234,14 @@ for (df in recommended_factors$name[recommended_factors$lowest != 1]) {
   local_df <- local_df[, apply(local_df, 2, sd, na.rm = TRUE) != 0]
 
   # Create lavaan model for 3-factor CFA
-  model <- create_cfa_model(local_df, n_factors = 3)
+  model <- get(paste0(df, "_model"))
 
   # Save factor analyses to list
   # Orthogonal rotation: factors assumed to be uncorrelated
-  factor_analyses[[paste0(df, "_obli")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "varimax")
+  factor_analyses[[paste0(df, "_obli")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "varimax", std.lv = TRUE)
 
   # Oblique rotation: factors assumed to be correlated
-  factor_analyses[[paste0(df, "_orth")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "promax")
+  factor_analyses[[paste0(df, "_orth")]] <- cfa(model, data = local_df, missing = "FIML", rotation = "promax", std.lv = TRUE)
 
   # Data Exportation ####
   # Save factor analyses results as Rdata
@@ -236,11 +253,6 @@ for (df in recommended_factors$name[recommended_factors$lowest != 1]) {
 
 # Script Clean-up ####
 rm(list = ls())
-
-
-
-df
-
 
 
 # File Report ####

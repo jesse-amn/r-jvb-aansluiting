@@ -31,7 +31,7 @@ if (any(grepl("/", list.files(recursive = TRUE, pattern = "amn_helpers.R")))) {
 }
 
 ## Load necessary packages: Fill into c() with comma-seperated quotation marks ####
-packages <- c("readr", "psych")
+packages <- c("readr", "psych", "lavaan")
 pkg_loader(packages)
 rm(packages)
 
@@ -76,7 +76,7 @@ data_frames <- sapply(initial_env, function(x) {
 
 ### Filter names ####
 data_frame_names <- initial_env[data_frames]
-data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|woordenrelateren", data_frame_names)]
+data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde", data_frame_names)]
 # names <- names[!grepl("meta|metenenmeetkunde|woordenrelateren", names)] # TODO: these did not work yet.
 
 # Remove df from recommended_factors if it exists
@@ -130,9 +130,6 @@ for (df in data_frame_names) {
   local_df <- local_df[
     , !grepl("ASL_componenten_21|ASL_componenten_11", colnames(local_df))
   ]
-
-
-
 
   # Create list to save factor analyses
   item_analyses <- list()

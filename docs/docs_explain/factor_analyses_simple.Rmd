@@ -13,9 +13,9 @@ output:
 # Load files
 library(here)
 library(tools)
-factor_analyses <- read.csv(here("data/factor_analyses_simple2023/recommended_factors.csv"))
+factor_analyses <- read.csv(here(paste0("data/factor_analyses_simple", format(Sys.Date(), "%Y")), "/recommended_factors.csv"))
 
-names <- list.files(here("data/factor_analyses_simple2023/"), full.names = TRUE)
+names <- list.files(here(paste0("data/factor_analyses_simple", format(Sys.Date(), "%Y"), "/")), full.names = TRUE)
 names <- names[grepl(".Rdata", names)]
 
 
@@ -35,15 +35,15 @@ rm(names)
 ## Introductie
 
 Binnen dit document worden de resultaten van de item analyse voorgelegd. De resultaten zijn voornamelijk gebaseerd op factor-analytische procedures.
-Specifiek zijn alle onderdelen van de aansluiting onderworpen aan een confirmatieve factor analyse (CFA). De resultaten van deze analyses zijn te vinden in de map `data/factor_analyses_simple2023/`. 
+Specifiek zijn alle onderdelen van de aansluiting onderworpen aan een confirmatieve factor analyse (CFA). De resultaten van deze analyses zijn te vinden in de map `data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/`. 
 De resultaten van de CFA's zijn vervolgens gebruikt om de vragen van de onderdelen van de aansluiting te beoordelen op hun kwaliteit, waar kwaliteit beoordeelt wordt door
 een combinatie van factor loadings, itemcorrelaties, en model fit indices. 
 
 Om een beter beeld te krijgen of de hoeveelheid factoren van de onderliggende elementen daadwerkelijk eenduidig genoeg zijn, zijn er exploratieve methodes gebruikt om dit te verder te onderzoeken. Hierbij
-zijn een Scree plot, met factor analyse en principiele componenten analyse vergelijk, alsook een parallel analyse gebruikt. De resultaten van deze analyses zijn te vinden in de map `data/factor_analyses_simple2023/fa_graphs`.
+zijn een Scree plot, met factor analyse en principiele componenten analyse vergelijk, alsook een parallel analyse gebruikt. De resultaten van deze analyses zijn te vinden in de map `data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs`.
 De resultaten van deze grafische methoden zijn gebruikt om de resultaten van de CFA's te ondersteunen, of te ontkrachten. Bij enkele onderdelen is er een alternatieve factor analyse uitgevoerd.
 Dit is gedaan voor de onderdelen waarbij de resultaten van de CFA's niet eenduidig waren, en de grafische methoden een hoger nummer aan factoren aangaven. De nieuwe CFA's 
-zijn uitgevoerd met het laagst aantal factoren dat de grafische methoden aangaven. De resultaten van deze analyses zijn te vinden in de map `data/factor_analyses_simple2023/alternative_factors`.
+zijn uitgevoerd met het laagst aantal factoren dat de grafische methoden aangaven. De resultaten van deze analyses zijn te vinden in de map `data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/alternative_factors`.
 
 Alle Factor Analyses zijn uitgevoerd in zowel oblique als ook orthogonale rotatie, wat respectievelijk betekent dat de factoren wel of niet gecorreleerd mogen zijn.
 
@@ -78,11 +78,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 1: Screeplot Betekenissen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/betekenissen_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/betekenissen_scree_plot.png)
 
 **Figuur 2: Parallel plot Betekenissen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/betekenissen_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/betekenissen_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -189,6 +189,7 @@ Zie figuur 3 voor een grafische weergave:
 ```{r betekenissen - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings Betekenissen", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -208,11 +209,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 4: Screeplot cijfers**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/cijfers_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/cijfers_scree_plot.png)
 
 **Figuur 5: Parallel plot cijfers**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/cijfers_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/cijfers_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -311,6 +312,7 @@ een grafische weergave van de factor Loadings.
 ```{r cijfers - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings Cijfers", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -324,11 +326,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 7: Screeplot componenten**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/componenten_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/componenten_scree_plot.png)
 
 **Figuur 8: Parallel plot componenten**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/componenten_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/componenten_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -423,6 +425,7 @@ en, op basis van de nabijheid tot de grenzwaarde van vraag 017, deze allen te he
 ```{r componenten - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings componenten", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -436,11 +439,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 10: Screeplot figuren**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/figuren_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/figuren_scree_plot.png)
 
 **Figuur 11: Parallel plot figuren**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/figuren_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/figuren_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -540,6 +543,7 @@ Zie figuur 12 voor een grafische weergave van de factor Loadings. Hierdoor wordt
 ```{r figuren - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings figuren", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -553,11 +557,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 13: Screeplot gedrag_houding_leerkracht**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/gedrag_houding_leerkracht_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/gedrag_houding_leerkracht_scree_plot.png)
 
 **Figuur 14: Parallel plot gedrag_houding_leerkracht**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/gedrag_houding_leerkracht_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/gedrag_houding_leerkracht_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -670,6 +674,7 @@ Zie figuur 15 en 16 voor een grafische weergave van de factor Loadings.
 ```{r gedrag_houding_leerkracht - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings gedrag_houding_leerkracht", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -679,6 +684,7 @@ factor_l <- df$factor_loadings
 factor_l <- factor_l[factor_l > 0]
 plot <- plot(factor_l)
 plot <- lines(factor_l)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings gedrag_houding_leerkracht", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -695,11 +701,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 17: Screeplot gedrag_houding_ouder**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/gedrag_houding_ouder_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/gedrag_houding_ouder_scree_plot.png)
 
 **Figuur 18: Parallel plot gedrag_houding_ouder**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/gedrag_houding_ouder_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/gedrag_houding_ouder_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -818,6 +824,7 @@ Zie hieronder voor een grafische weergave.
 ```{r gedrag_houding_ouder - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings gedrag_houding_ouder", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -847,11 +854,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 20: Screeplot gedrag_houding**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/gedrag_houding_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/gedrag_houding_scree_plot.png)
 
 **Figuur 21: Parallel plot gedrag_houding**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/gedrag_houding_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/gedrag_houding_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -979,6 +986,7 @@ Zie hieronder voor een grafische weergave.
 ```{r gedrag_houding - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings gedrag_houding", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1008,11 +1016,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 23: Screeplot getallen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/getallen_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/getallen_scree_plot.png)
 
 **Figuur 24: Parallel plot getallen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/getallen_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/getallen_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1114,6 +1122,7 @@ de genoemde vragen niet goed te passen bij de factor. Zie hieronder voor een gra
 ```{r getallen - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings getallen", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1127,11 +1136,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 26: Screeplot interesse**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/interesse_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/interesse_scree_plot.png)
 
 **Figuur 27: Parallel plot interesse**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/interesse_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/interesse_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1242,6 +1251,7 @@ De vragen die boven .3 vallen hebben geen grote afstand van ASL_interesse_001...
 ```{r interesse - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings interesse", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1262,11 +1272,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 29: Screeplot leestekens**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/leestekens_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/leestekens_scree_plot.png)
 
 **Figuur 30: Parallel plot leestekens**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/leestekens_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/leestekens_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1363,6 +1373,7 @@ de "beste" vraag een relatief lage factor loading van 0.43 heeft.
 ```{r leestekens - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings leestekens", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1379,11 +1390,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot lezen_deel1**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/lezen_deel1_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/lezen_deel1_scree_plot.png)
 
 **Figuur 33: Parallel plot lezen_deel1**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/lezen_deel1_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/lezen_deel1_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1484,6 +1495,7 @@ De eerstvolgende vraag ASL7_lezen_LV_APENKOOI_0F_006, boven .3 zit er relatief d
 ```{r lezen_deel1 - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings lezen_deel1", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1504,11 +1516,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot lezen_deel2**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/lezen_deel2_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/lezen_deel2_scree_plot.png)
 
 **Figuur 33: Parallel plot lezen_deel2**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/lezen_deel2_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/lezen_deel2_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1610,6 +1622,7 @@ De eerstvolgende vraag zit met een relatief hoge afstand vandaan van .3. Zie hie
 ```{r lezen_deel2 - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings lezen_deel2", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1626,11 +1639,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot opzoeken**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/opzoeken_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/opzoeken_scree_plot.png)
 
 **Figuur 33: Parallel plot opzoeken**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/opzoeken_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/opzoeken_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1728,6 +1741,7 @@ De eerstvolgende vraag zit met een relatief hoge afstand vandaan van .3. Zie hie
 ```{r opzoeken - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings opzoeken", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1744,11 +1758,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot sommenmaken**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/sommenmaken_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/sommenmaken_scree_plot.png)
 
 **Figuur 33: Parallel plot sommenmaken**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/sommenmaken_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/sommenmaken_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1850,6 +1864,7 @@ De eerstvolgende vraag zit relatief dichtbij ASL_sommenmaken_011 (0.3001889). Zi
 ```{r sommenmaken - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings sommenmaken", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -1871,11 +1886,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot spelling**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/spelling_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/spelling_scree_plot.png)
 
 **Figuur 33: Parallel plot spelling**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/spelling_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/spelling_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -1995,6 +2010,7 @@ Door de hoeveelheid vragen, als ook reccomended factors van tabel 1, wordt geadv
 ```{r spelling - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings spelling", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -2014,11 +2030,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot verbanden**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/verbanden_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/verbanden_scree_plot.png)
 
 **Figuur 33: Parallel plot verbanden**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/verbanden_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/verbanden_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -2118,6 +2134,7 @@ Door de hoeveelheid vragen, als ook reccomended factors van tabel 1, wordt geadv
 ```{r verbanden - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings verbanden", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -2137,11 +2154,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot verhoudingen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/verhoudingen_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/verhoudingen_scree_plot.png)
 
 **Figuur 33: Parallel plot verhoudingen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/verhoudingen_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/verhoudingen_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -2238,6 +2255,7 @@ Zie hieronder voor een grafische weergave:
 ```{r verhoudingen - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings verhoudingen", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -2251,11 +2269,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot verschillen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/verschillen_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/verschillen_scree_plot.png)
 
 **Figuur 33: Parallel plot verschillen**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/verschillen_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/verschillen_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -2356,6 +2374,7 @@ Zie hieronder voor een grafische weergave:
 ```{r verschillen - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings verschillen", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -2375,11 +2394,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot werkwoordspelling**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/werkwoordspelling_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/werkwoordspelling_scree_plot.png)
 
 **Figuur 33: Parallel plot werkwoordspelling**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/werkwoordspelling_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/werkwoordspelling_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -2480,6 +2499,7 @@ Zie hieronder voor een grafische weergave:
 ```{r werkwoordspelling - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings werkwoordspelling", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 
@@ -2505,11 +2525,11 @@ die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de be
 
 **Figuur 32: Screeplot woorden**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/woorden_scree_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/woorden_scree_plot.png)
 
 **Figuur 33: Parallel plot woorden**
 
-![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple2023/fa_graphs/woorden_parallel_plot.png)
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/woorden_parallel_plot.png)
 
 
 #### Statitische Methoden
@@ -2613,6 +2633,7 @@ Zie hieronder voor een grafische weergave:
 ```{r woorden - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
 plot <- plot(df$factor_loadings)
 plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
 plot <- title(main = "Factor Loadings woorden", sub = "Item factor loadings; order based on item factor loadings order")
 ```
 Op basis van de resultaten, wordt in eerste instantie geadviseerd te kijken naar een 2-factor model.
@@ -2623,10 +2644,129 @@ Mocht het 1-factor model dwingend zijn, dan wordt geadviseerd om op zijn minst d
 - ASL_woorden_014: 0.1394278
 
 
+### Woorden Relateren
+
+Hieronder, in figuur 23 en 24, zie je de resultaten van de grafische methoden voor de woordenrelateren, waarbij de factor analyse en de principiele woordenrelateren analyse zijn weergegeven.
+Beide woordenrelateren zijn soortgelijk te interpreteren; in de plots staan de eigen values weergegeven op de verticale axis, en het aantal factoren op de horizontale axis. In Beide
+grafieken wordt een cut-off weergegeven in de vorm van of een vaste zwarte lijn (Eigenvalues > 1), of een rode stippellijn (simulatie vergelijk). De hoeveelheid factoren
+die boven deze lijn uitkomen, zijn de aanbevolen hoeveelheid factoren voor de betreffende onderdeel. 
+
+**Figuur 32: Screeplot woordenrelateren**
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/woordenrelateren_scree_plot.png)
+
+**Figuur 33: Parallel plot woordenrelateren**
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/factor_analyses_simple`r format(Sys.Date(), "%Y")`/fa_graphs/woordenrelateren_parallel_plot.png)
+
+
+#### Statitische Methoden
+
+```{r woordenrelateren - stat extraction, echo=FALSE, message=FALSE, warning=FALSE}
+# null hypothesis: empirical chi-square
+p <- round(woordenrelateren$woordenrelateren_obli$EPVAL, 3) # < .05
+chisq <- woordenrelateren$woordenrelateren_obli$chi
+
+# model fit indices
+rmsea <- woordenrelateren$woordenrelateren_obli$RMSEA[1] # < .06 or .08
+tli <- woordenrelateren$woordenrelateren_obli$TLI # > 0.95
+rms <- woordenrelateren$woordenrelateren_obli$crms # correct RMS, < 0.08
+
+#  Explained variance
+factor_r2 <- woordenrelateren$woordenrelateren_obli$R2
+
+# Factor loadings
+loadings <- woordenrelateren$woordenrelateren_obli$loadings # factor loadings
+weights <- woordenrelateren$woordenrelateren_obli$weights # These are the factor score coefficients, which are used to compute factor scores for each observation in your data.
+h2 <- woordenrelateren$woordenrelateren_obli$communality # communalities
+u2 <- woordenrelateren$woordenrelateren_obli$uniqueness # uniquenesses
+
+# Correlation matrix
+corr_matrix <- woordenrelateren$woordenrelateren_obli$r
+```
+##### Model Beoordeling
+
+Hieronder, in tabel 20, zie je de model-fit statistieken van de CFA voor woordenrelateren. Hierbij een korte uitleg wat het exact betekent:
+
+- p-value: de p-waarde van de empirische chi-square. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CRMS: de Corrected Root Mean Square. Dit kwantificeert het gemiddelde verschil tussen waargenomen en voorspelde waarden in een model. Het geeft een maat voor hoe goed de voorwoordenrelaterenen van het model overeenkomen met de daadwerkelijke gegevens. Lagere RMRS-waarden geven een betere overeenkomst aan, wat wijst op een nauwkeuriger model.
+
+**Tabel 22: woordenrelateren - Model-fit statistieken**
+
+```{r woordenrelateren - model fit table, echo=FALSE, message=FALSE, warning=FALSE}
+# Create dataframe
+df <- data.frame(
+  Statistic_Name = c("p-value", "RMSEA", "TLI", "CRMS"),
+  Result = c(p, rmsea, tli, rms),
+  Cut_off = c("> .05", "< .05 | .05 - .1 | > .1", "> .95 | .90 - .95 | < .90", "< .08 | .08 - .10 | > .10"),
+  Conclusion = c("Poor", "Good", "Acceptable", "Good")
+)
+
+# Create table
+knitr::kable(df, col.names = c("Statistic", "Result", "Cut-off", "Conclusion"))
+```
+
+De model fit indices relatief zijn positief. Ondanks een significante p-waarde van de empirische chi-square test (chi-square = `r chisq`, p < `r p`), en de RMSEA en CRMS zijn goed, en de TLI acceptabel 
+Gezien de nummer van observaties (N =`r woordenrelateren$woordenrelateren_obli$n.obs`), is het verstandiger om de p-waarde van de empirische chi-square test als minder betrouwbaar te zien. Op basis hiervan,
+als ook op basis van de recommended factors in figuur 1, wordt geadviseerd om het factor model niet te heroverwegen.
+
+##### Item Beoordeling
+
+Hieronder staan de factor loadings, factor weights, communalities, en uniquenesses weergegeven. Hieronder een beknopte uitleg van wat deze waarden betekenen:
+
+- Factor loadings: de factor loadings geven aan hoe sterk een item correleert met een factor. Hoe hoger de factor loading, hoe sterker de correlatie. Een factor loading van .3 of hoger wordt gezien als een goede factor loading.
+- Factor weights: de factor weights geven aan hoeveel gewicht een item heeft op een factor. Deze wordt gebruikt om de factor scores te berekenen. Hoe hoger de factor weight, hoe meer gewicht een item heeft op een factor.
+- Communalities: de communalities geven aan hoeveel variantie een item deelt met andere items. Hoe hoger de communalities, hoe meer variantie een item deelt met andere items. Een hoge communaliteit betekent dat een item goed bij de factor past.
+- Uniquenesses: de uniquenesses geven aan hoeveel variantie een item niet deelt met andere items. Hoe hoger de uniquenesses, hoe meer variantie een item niet deelt met andere items. Een hoge uniqueness betekent dat een item niet goed bij de factor past.
+
+**Tabel 23: woordenrelateren - Model-fit statistieken**
+
+```{r woordenrelateren - Item loadings, echo=FALSE, message=FALSE, warning=FALSE}
+# Create dataframe
+df <- data.frame(
+  naam = rownames(weights),
+  factor_loadings = loadings,
+  weights = weights
+)
+
+df$communalities <- h2
+df$uniquenesses <- u2
+
+df <- df[order(df$factor_loadings, decreasing = TRUE), ]
+rownames(df) <- NULL
+df <- df[!grepl("intro", df$naam, ignore.case = TRUE), ]
+
+# Create table
+knitr::kable(df, col.names = c("Naam", "Factor Loading", "Factor Weights", "Communality", "Uniqueness"))
+```
+
+Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
+
+- ASL_woordenrelateren_017: 0.2906343
+- ASL_woordenrelateren_004: 0.2663853
+- ASL_woordenrelateren_006: 0.2520672
+- ASL_woordenrelateren_016: 0.`r format(Sys.Date(), "%Y")`484
+   
+Zie hieronder voor een grafische weergave:
+
+**Figuur 34: Factor Loadings woordenrelateren**
+```{r woordenrelateren - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
+plot <- plot(df$factor_loadings)
+plot <- lines(df$factor_loadings)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
+plot <- title(main = "Factor Loadings woordenrelateren", sub = "Item factor loadings; order based on item factor loadings order")
+```
+Mocht het noodzakelijk zijn slechts een vraag te heroverwegen, dan wordt geadviseerd om de volgende vraag te herevalueren:
+
+-ASL_woordenrelateren_016:0.`r format(Sys.Date(), "%Y")`484
+
+
 ## Alternatieve Resultaten
 
 ```{r alternative results, echo=FALSE, message=FALSE, warning=FALSE}
-names <- list.files(here("data/factor_analyses_simple2023/alternative_factors"), full.names = TRUE)
+names <- list.files(here(paste0("data/factor_analyses_simple", format(Sys.Date(), "%Y"), "/alternative_factors")), full.names = TRUE)
 names <- names[grepl(".Rdata", names)]
 
 
