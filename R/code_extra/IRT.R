@@ -75,7 +75,6 @@ data_frame_names <- initial_env[data_frames]
 data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|gedrag_houding|interesse", data_frame_names)]
 data_frame_names <- data_frame_names[data_frame_names != "local_df" & data_frame_names != "recommended_factors"]
 
-
 ## Create Subdirectories ####
 ### Create subdirectory named "item_analyses<year>" in ./data ####
 subdirectory <- paste0("./data/irt_analyses", format(Sys.Date(), "%Y"))
@@ -87,15 +86,17 @@ dir.create(graph_subdirectory)
 
 
 
-# Data Preparation ####
+# Data Analyses ####
 irt_fits <- list() # Create an empty list to store the irt_fit objects
 
+## Loop through the data frames ####
 for (df in data_frame_names) {
   print(df)
-  ## Get and filter data ####
+  ### Get and filter data ####
   local_df <- get(df)
   local_df <- local_df[, !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))]
 
+  ### Create irt_fit object ####
   irt_fit <- mirt(
     data = local_df,
     model = 1, # Number of factors
@@ -104,81 +105,75 @@ for (df in data_frame_names) {
     verbose = TRUE,
     emcycles = 500 # Increase the maximum number of EM cycles to N
   )
+
+  ### Store irt_fit object ####
   irt_fits[[df]] <- irt_fit # Store the irt_fit object in the list
-  saveRDS(irt_fit, file = paste0("./data/irt_analyses_", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
+  saveRDS(irt_fit, file = paste0("./data/irt_analyses", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
+
+  ### Remove local objects ####
+  rm(local_df)
 }
-
-
-for (i in seq_along(irt_fits)) {
-  print(i)
-  fit <- irt_fits[[i]]
-  #print(fit)
-  params <- coef(fit, IRTpars = TRUE, simplify = TRUE)
-  "
-  # Item characteristics curves
-  tracePlot(irt_fit)
-
-  itempersonMap(irt_fit)
-  "
-}
-
-
-# Data Analyses - Main ####
-fit
-
-
-
-
-
-
-summary(irt_fit)
-
-params <- coef(fit, IRTpars = TRUE, simplify = TRUE)
-round(params$items, 2) # g = c = guessing parameter
-params
-# Model fit
-M2(irt_fit)
-
-# item fit
-itemfit(irt_fit)
-itemfitPlot(irt_fit)
-
-# person fit
-head(personfit(irt_fit))
-
-personfit(irt_fit) %>%
-  reframe(
-    infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
-    outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
-  ) # lower row = non-fitting people
-
-
-
-# Item characteristics curves
-tracePlot(irt_fit)
 
 
 # Data Analyses - Explication ####
-install.packages("randomcoloR")
-library(randomcoloR)
-params$items
-tracePlot(fit, facet = FALSE, legend = TRUE) +
-  scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+for (i in seq_along(irt_fits)) {
+  print(i)
+  fit <- irt_fits[[i]]
 
-tracePlot(irt_fit, items = c(1:5), facet = FALSE, legend = TRUE) +
-  scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+  name <- names(irt_fits)[i] # Get the name of the fit
 
-# Item info curve
-itemInfoPlot(irt_fit, legend = TRUE) +
-  scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
-itemInfoPlot(irt_fit, facet = TRUE)
+  params <- coef(fit, IRTpars = TRUE, simplify = TRUE)
 
-# Test information curve
-testInfoPlot(irt_fit, adj_factor = 2)
+  # Item characteristics curves, separate
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_separate.png"))
+  plot <- tracePlot(fit)
+  print(plot)
+  dev.off()
 
-scaleCharPlot(irt_fit)
+  # Item charactfristics curves, combined
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_combined.png"))
+  plot <- tracePlot(fit, facet = FALSE, legend = TRUE)
+  plot <- plot + scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+  print(plot)
+  dev.off()
 
+  # Item info curve, separate
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_separate.png"))
+  plot <- itemInfoPlot(fit, facet = TRUE)
+  print(plot)
+  dev.off()
 
+  # Item info curve, combined
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_combined.png"))
+  plot <- itemInfoPlot(fit, legend = TRUE)
+  plot <- plot + scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+  print(plot)
+  dev.off()
+
+  # Item fit
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_fit.png"))
+  plot <- itemfitPlot(fit)
+  print(plot)
+  dev.off()
+
+  # Item-Person fit
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_person_fit.png"))
+  plot <- itempersonMap(fit)
+  print(plot)
+  dev.off()
+
+  # Test information curve
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TIC.png"))
+  plot <- testInfoPlot(fit, adj_factor = 2)
+  print(plot)
+  dev.off()
+
+  # Test characteristic curve
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TCC.png"))
+  plot <- scaleCharPlot(fit)
+  print(plot)
+  dev.off()
+}
 
 
 
@@ -191,6 +186,37 @@ scaleCharPlot(irt_fit)
 
 
 # Script Clean-up ####
-
+rm(list = ls())
 
 # File Report ####
+"
+# How to get data:
+
+summary(irt_fit)
+
+params <- coef(fit, IRTpars = TRUE, simplify = TRUE)
+round(params$items, 2) # g = c = guessing parameter
+
+# Model fit
+M2(irt_fit)
+
+# item fit
+itemfit(irt_fit)
+
+
+# person fit
+head(personfit(irt_fit))
+
+personfit(irt_fit) %>%
+  reframe(
+    infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+    outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+  ) # lower row = non-fitting people
+
+
+# How to get seperate ICC graphs for a few items (from the fit):
+
+tracePlot(fit, items = c(1:5), facet = FALSE, legend = TRUE) + f
+scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
+
+"
