@@ -40,7 +40,7 @@ wd_set_current()
 
 ## Create script-specific functions
 create_cfa_model <- function(df) {
-  variables <- colnames(df[, !grepl("package_duration|student_number|student_name|birth_date", colnames(df))])
+  variables <- colnames(df[, !grepl("package_duration|student_number|student_name|birth_date|gender", colnames(df))])
   # Create a string for the model
   model_string <- paste(variables, collapse = " + ")
 
@@ -117,21 +117,6 @@ for (df in data_frame_names) {
   # Append name to recommended_factors
   recommended_factors$name[which(data_frame_names == df)] <- df
   # Create list to save factor analyses
-  factor_analyses <- list()
-
-  # Get df locally
-  local_df <- get(df)
-
-  # Filter df
-  local_df <- local_df[
-    , !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))
-  ]
-  # Remove items with extreme missingness.
-  local_df <- local_df[
-    , !grepl("ASL_componenten_21|ASL_componenten_11", colnames(local_df))
-  ]
-
-  # Create list to save factor analyses
   item_analyses <- list()
 
   # Get df locally
@@ -139,7 +124,11 @@ for (df in data_frame_names) {
 
   # Filter df
   local_df <- local_df[
-    , !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))
+    , !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(local_df))
+  ]
+  # Remove items with extreme missingness.
+  local_df <- local_df[
+    , !grepl("ASL_componenten_21|ASL_componenten_11", colnames(local_df))
   ]
 
   # Remove empty rows
@@ -210,7 +199,7 @@ for (df in recommended_factors$name[recommended_factors$lowest != 1]) {
   # Filter df
   local_df <- local_df[
     ,
-    !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))
+    !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(local_df))
   ]
 
   # Remove empty rows

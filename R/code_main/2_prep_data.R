@@ -65,7 +65,6 @@ rm(df)
 ## Metadata ####
 meta_df <- read.csv("./data/data_input/meta_file.csv")
 
-
 # Data Preparation ####
 ## Main data ####
 for (name in basename(file_list) %>% gsub(".csv", "", .)) {
@@ -74,7 +73,7 @@ for (name in basename(file_list) %>% gsub(".csv", "", .)) {
   df <- get(name)
 
   # filter df
-  df <- df[, grepl("student_name|birth_date|student_number|package_origin|package_duration_raw|item.SCORE", colnames(df))]
+  df <- df[, grepl("student_name|birth_date|student_number|gender|package_origin|package_duration_raw|item.SCORE", colnames(df))]
   df <- df[, !grepl("intro_prac|intro_info|_wrong", colnames(df))]
 
   # Remove completely empty columns
@@ -127,7 +126,13 @@ if (item_analyses == TRUE) {
   sink("/dev/null")
   suppressWarnings(suppressMessages(source(paste0("./R/code_extra/factor_analyses_simple.R"), echo = FALSE)))
   sink()
+
+  sink("/dev/null")
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/IRT.R"), echo = FALSE)))
+  sink()
 }
+
+
 
 
 

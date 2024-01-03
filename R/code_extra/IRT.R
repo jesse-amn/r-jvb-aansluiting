@@ -75,6 +75,7 @@ data_frame_names <- initial_env[data_frames]
 data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|gedrag_houding|interesse", data_frame_names)]
 data_frame_names <- data_frame_names[data_frame_names != "local_df" & data_frame_names != "recommended_factors"]
 
+
 ## Create Subdirectories ####
 ### Create subdirectory named "item_analyses<year>" in ./data ####
 subdirectory <- paste0("./data/irt_analyses", format(Sys.Date(), "%Y"))
@@ -85,7 +86,6 @@ graph_subdirectory <- paste0(subdirectory, "/irt_graphs")
 dir.create(graph_subdirectory)
 
 
-
 # Data Analyses - Main ####
 irt_fits <- list() # Create an empty list to store the irt_fit objects
 
@@ -94,7 +94,7 @@ for (df in data_frame_names) {
   print(df)
   ### Get and filter data ####
   local_df <- get(df)
-  local_df <- local_df[, !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))]
+  local_df <- local_df[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(local_df))]
 
   ### Create irt_fit object ####
   irt_fit <- mirt(
@@ -103,7 +103,7 @@ for (df in data_frame_names) {
     method = "EM", # can be changed: MCEM (monte-carlo EM)
     itemtype = "2PL", # can be changed: RASCH, 3PL
     verbose = TRUE,
-    emcycles = 500 # Increase the maximum number of EM cycles to N
+    emcycles = 500, # Increase the maximum number of EM cycles to N
   )
 
   ### Store irt_fit object ####
@@ -128,51 +128,52 @@ for (i in seq_along(irt_fits)) {
 
   ## Create and save Graphs ####
   ### Item characteristics curves, separate ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_separate.png"))
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_separate.png"), width = 1200, height = 800)
   plot <- tracePlot(fit)
   print(plot)
   dev.off()
 
   ### Item charactfristics curves, combined ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_combined.png"))
+  # Increase resolution of graphs
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_combined.png"), width = 1200, height = 800)
   plot <- tracePlot(fit, facet = FALSE, legend = TRUE)
   plot <- plot + scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
   print(plot)
   dev.off()
 
   ### Item info curve, separate ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_separate.png"))
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_separate.png"), width = 1200, height = 800)
   plot <- itemInfoPlot(fit, facet = TRUE)
   print(plot)
   dev.off()
 
   ### Item info curve, combined ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_combined.png"))
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_combined.png"), width = 1200, height = 800)
   plot <- itemInfoPlot(fit, legend = TRUE)
   plot <- plot + scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
   print(plot)
   dev.off()
 
   ### Item fit ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_fit.png"))
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_fit.png"), width = 1200, height = 800)
   plot <- itemfitPlot(fit)
   print(plot)
   dev.off()
 
   ### Item-Person fit ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_person_fit.png"))
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_person_fit.png"), width = 1200, height = 800)
   plot <- itempersonMap(fit)
   print(plot)
   dev.off()
 
   ### Test information curve ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TIC.png"))
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TIC.png"), width = 1200, height = 800)
   plot <- testInfoPlot(fit, adj_factor = 2)
   print(plot)
   dev.off()
 
   ### Test characteristic curve ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TCC.png"))
+  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TCC.png"), width = 1200, height = 800)
   plot <- scaleCharPlot(fit)
   print(plot)
   dev.off()

@@ -42,7 +42,7 @@ wd_set_current()
 ## Create script-specific functions
 
 create_cfa_model <- function(df) {
-  variables <- colnames(df[, !grepl("package_duration|student_number|student_name|birth_date", colnames(df))])
+  variables <- colnames(df[, !grepl("package_duration|student_number|student_name|birth_date|gender", colnames(df))])
 
   cfa_model <- paste0("f1", " =~ ", paste(variables, collapse = " + "))
 
@@ -124,7 +124,7 @@ for (df in data_frame_names) {
 
   # Filter df
   local_df <- local_df[
-    , !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))
+    , !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(local_df))
   ]
   # Remove items with extreme missingness.
   local_df <- local_df[
@@ -224,7 +224,7 @@ for (df in recommended_factors$name[recommended_factors$lowest != 1]) {
   # Filter df
   local_df <- local_df[
     ,
-    !grepl("package_duration_raw|student_number|student_name|birth_date", colnames(local_df))
+    !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(local_df))
   ]
 
   # Remove empty variables

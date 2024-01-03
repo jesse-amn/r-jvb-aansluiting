@@ -171,7 +171,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings en de communality/uniqueness waardes, kunnen twee reccomendaties gemaakt worden.
@@ -301,7 +301,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Een groot gedeelte van de vragen heeft een zeer goede factor loading. Maar,
@@ -421,7 +421,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings en de communality/uniqueness waardes, lijkt de uitkomts voor een een-factor model duidelijk.
@@ -535,7 +535,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings en de communality/uniqueness waardes, zijn er 3 a 4 vragen die heroverwogen kunnen worden, namelijk:
@@ -657,7 +657,7 @@ Hieronder staan de factor loadings, factor weights, communalities, en uniqueness
 # rownames(df) <- NULL
 
 # # Create table
-# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 # ```
 
 Ondanks de foutieve model fit, blijken de vragen binnen een 1-factor model relatief goed te loaden op een gemeenzame factor. Dit kan betekenen
@@ -799,7 +799,7 @@ Hieronder staan de factor loadings, factor weights, communalities, en uniqueness
 # rownames(df) <- NULL
 
 # # Create table
-# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 # ```
 
 In combinatie met de slechte model fit, blijken ook de vragen binnen een 1-factor model relatief slecht te loaden op een gemeenzame factor. Dit wijst 
@@ -952,7 +952,7 @@ Hieronder staan de factor loadings, factor weights, communalities, en uniqueness
 # rownames(df) <- NULL
 
 # # Create table
-# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 # ```
 
 In combinatie met de slechte model fit, blijken ook de vragen binnen een 1-factor model relatief slecht te loaden op een gemeenzame factor. Dit wijst 
@@ -1114,7 +1114,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings en de communality/uniqueness waardes, zijn er enkele vragen die heroverwogen kunnen worden. Hieronder een lijst van vragen met een factor loading onder de .3:
@@ -1234,7 +1234,7 @@ Hieronder staan de factor loadings, factor weights, communalities, en uniqueness
 # rownames(df) <- NULL
 
 # # Create table
-# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+# knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 # ```
 
 Op basis van de factor loadings en de communality/uniqueness waardes, zijn er enkele vragen die heroverwogen kunnen worden. Hieronder een lijst van vragen met een factor loading onder de .3:
@@ -1370,7 +1370,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings is er slechts een vraag die heroverwogen kan worden:
@@ -1487,7 +1487,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -1614,7 +1614,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -1739,7 +1739,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -1859,7 +1859,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er geen vragen die heroverwogen hoeven te worden. Wel lijkt het model
@@ -1977,7 +1977,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -2124,7 +2124,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -2250,7 +2250,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -2366,7 +2366,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -2490,7 +2490,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -2622,7 +2622,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -2751,7 +2751,7 @@ df <- df[order(df$factor_loadings, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "unstd. Factor Loading", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading", "Factor Weights", "Explained Variance"))
 ```
 
 Op basis van de factor loadings zijn er enkele vraag die heroverwogen kunnen worden:
@@ -2875,7 +2875,7 @@ df <- df[order(df$factor_loadings_1, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "unstd. Factor Loading 1", "unstd. Factor Loading 2", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "Factor Weights 1", "Factor Weights 2", "Explained Variance"))
 ```
 
 Gebaseerd op het 2-factor model, blijken er nog 2 vragen over te blijven die niet goed laden:
@@ -2979,7 +2979,7 @@ df <- df[order(df$factor_loadings_1, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "unstd. Factor Loading 1", "unstd. Factor Loading 2", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "Factor Weights 1", "Factor Weights 2", "Explained Variance"))
 ```
 
 Gebaseerd op het 2-factor model, blijken er meerdere vragen
@@ -3089,7 +3089,7 @@ df <- df[order(df$factor_loadings_1, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "unstd. Factor Loading 1", "unstd. Factor Loading 2", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "Factor Weights 1", "Factor Weights 2", "Explained Variance"))
 ```
 
 Gebaseerd op het 2-factor model, blijken er meerdere vragen
@@ -3195,7 +3195,7 @@ df <- df[order(df$factor_loadings_1, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "unstd. Factor Loading 1", "unstd. Factor Loading 2", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "Factor Weights 1", "Factor Weights 2", "Explained Variance"))
 ```
 
 Gebaseerd op het 2-factor model, zijn er geen vragen die heroverwogen hoeven te worden.
@@ -3300,7 +3300,7 @@ df <- df[order(df$factor_loadings_1, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "std. Factor Loading 3", "unstd. Factor Loading 1", "unstd. Factor Loading 2", "unstd. Factor Loading 3", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "std. Factor Loading 3", "Factor Weights 1", "Factor Weights 2", "Factor Weights 3", "Explained Variance"))
 ```
 
 Gebaseerd op het 2-factor model, blijken er meerdere vragen
@@ -3421,7 +3421,7 @@ df <- df[order(df$factor_loadings_1, decreasing = TRUE), ]
 rownames(df) <- NULL
 
 # Create table
-knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "unstd. Factor Loading 1", "unstd. Factor Loading 2", "Explained Variance"))
+knitr::kable(df, col.names = c("Naam", "std. Factor Loading 1", "std. Factor Loading 2", "Factor Weights 1", "Factor Weights 2", "Explained Variance"))
 ```
 
 Het lijkt erop dat het 2-factor model niet laad. De fit indices zijn slecht, en de waardes voor beide factroren zijn hetzelfde. 

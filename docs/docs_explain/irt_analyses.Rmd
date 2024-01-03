@@ -1,0 +1,252 @@
+---
+title: "Aansluiting Item Analyse"
+author: "J.F.J. (Jesse) van Bussel"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+output:
+  html_document:
+    theme: readable
+    toc: true # table of contents
+    toc_float: true # float: stays up left
+    css: ["./css/custom.css", "./css/style_documentation.css"]
+---
+
+```{r Environment set-up, echo=FALSE, message=FALSE, warning=FALSE}
+# Load files
+library(lordif)
+library(here)
+library(tools)
+library(lavaan)
+library(dplyr)
+```
+
+# Aansluiting Item Response Analyse
+
+## Introductie
+
+Binnen dit document worden de resultaten van de item analyse voorgelegd. De resultaten zijn gebaseerd op 1-factor IRT modellen, waarbij de 1-factor IRT modellen zijn geschat met de `mirt` package.
+Specifiek zijn alle onderdelen (behalve metenenmeetkunde, gedrag_houding, gedrag_houding_leerkracht, gedrag_houding_ouder) onderworpen aan een 1-factor IRT model. De resultaten van deze analyses zijn te vinden in de map `data/irt_analyses`r format(Sys.Date(), "%Y")`/`.
+De resultaten van de 1-factor IRT modellen zijn vervolgens gebruikt om de vragen van de onderdelen van de aansluiting te beoordelen op hun kwaliteit, waar kwaliteit beoordeelt wordt door
+een combinatie van item discriminatie, item fit, en item informatie.
+
+Om een beter beeld te krijgen van de kwaliteit van de vragen, zijn er grafische methodes gebruikt om dit te verder te onderzoeken. Hierbij
+zijn, onderanderen, een item informatie plot, item fit plot, en item discriminatie plot gebruikt. De resultaten van deze analyses zijn te vinden in de map `data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs`.
+
+Hieronder volgt een overzicht van de resultaten van de IRT's, en de grafische methoden, als ook van de alternatieve factor analyses. 
+De resultaten van de reguliere en alternatieve IRT's zijn weergegeven in de vorm van een tabel, waarbij de factor loadings, item correlaties, en model fit indices zijn weergegeven. 
+De grafische methoden zijn weergegeven in de vorm van een grafiek, waarbij de resultaten van de factor analyse, en de principiele componenten analyse zijn weergegeven.
+
+## Resultaten
+
+### Betekenissen
+
+```{r Betekenissen - stat extraction, echo=FALSE, message=FALSE, warning=FALSE}
+# load data
+fit <- readRDS(paste0(here(), "/data/irt_analyses2024/irt_fit_betekenissen.rds"))
+data <- read.csv(paste0(here(), "/data/data_interrim/betekenissen.csv"))
+
+# Model fit
+model_fit <- as.data.frame(M2(fit, na.rm = TRUE))
+model_fit <- cbind(model_fit, nrow(data))
+model_fit <- rename(model_fit, `N` = `nrow(data)`)
+model_fit <- tidyr::pivot_longer(model_fit, cols = -N, names_to = "Fit Index", values_to = "Value")
+model_fit <- dplyr::select(model_fit, `Fit Index`, Value)
+model_fit$`Cut-Off` <- c("", "", "> .05", "< .05 | .05 - .1 | > .1", "", "", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90", "> .95 | .90 - .95 | < .90")
+
+# item fit
+item_fit <- itemfit(fit, na.rm = TRUE)
+colnames(item_fit) <- c("Item", "X2", "df", "RMSEA", "p")
+item_fit <- item_fit[order(item_fit$X2), ]
+rownames(item_fit) <- NULL
+
+
+# Item parameters
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+params <- params[, -which(colnames(params) %in% c("items.g", "items.u", "means", "F1"))]
+sink(file = "/dev/null")
+sum <- summary(fit)
+sink()
+params <- cbind(params, sum$rotF)
+params <- cbind(params, sum$h2)
+params <- params[, c("F1", colnames(params)[-which(colnames(params) %in% "F1")])]
+colnames(params) <- c("Factor Loading", "Discrimination Parameter", "Difficulty Parameter ", "Communalities")
+params <- params[order(params$`Factor Loading`, decreasing = TRUE), ]
+
+
+# # Differential Item Functionining DIF
+# # Prepare the data
+# gender <- data$gender
+# gender <- dplyr::recode(gender, "Man" = 1, "Vrouw" = 2, "Onbekend" = 2)
+# gender <- as.factor(gender)
+# local_df <- data[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(data))]
+
+# # Fit the multiple group model
+# dif_fit <- mirt::multipleGroup(
+#   data = local_df,
+#   model = 1,
+#   group = gender
+# )
+
+# # Perform DIF analysis
+# dif <- mirt::DIF(dif_fit, group = gender, which.par = c("a1", "d"), na.rm = TRUE, plotdif = TRUE)
+
+# person fit
+person_fit <- personfit(fit) %>%
+  reframe(
+    infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+    outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+  ) # lower row = non-fitting people
+person_fit$Correct <- c("Correct", "Incorrect")
+person_fit <- person_fit %>% dplyr::select(Correct, everything())
+```
+
+#### Model Fit
+
+Hieronder bevinden zich de verschillende model fit indices.Hierbij een korte uitleg wat het exact betekent:
+
+- M2: Dit is de M2-statistiek van Maydeu-Olivares, die een maat is voor de absolute fit van het model. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+  - RMSEA_5 en RMSEA_95: de 95% betrouwbaarheidsinterval van de RMSEA. Hoe kleiner dit interval rondom de RMSEA waarde, hoe zekerder we zijn van die waarde. 
+- SRMSR: SRMSR staat voor "Standardized Root Mean Square Residual". Het is een maat voor de gemiddelde discrepantie tussen de waargenomen en voorspelde covarianties. Een lagere waarde duidt op een betere fit. Een SRMSR van minder dan 0.08 wordt over het algemeen als goed beschouwd.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- N: het aantal respondenten in de steekproef.
+
+```{r Betekenissen - model fit, echo=FALSE, message=FALSE, warning=FALSE}
+model_fit$`Conclusion` <- c("", "", "Poor", "Good", "", "", "Good", "Good", "Good")
+knitr::kable(model_fit)
+```
+
+Als we kijken naar de fit indices, zien dat betekenissen een goeie fit heeft bereikt in het 1-factor-IRT model. Alle fit indices zijn als goed bevonden, met uitzondering van de p-waarde.
+Gezien de hoge hoeveelheid observaties (N = `r nrow(data)`), kan de p-waarde onbetrouwbaar zijn, gezien diens gevoeligheid voor sample size. Daarom wordt de p-waarde genegeerd, en wordt er geconcludeerd dat het model goed past.
+
+#### Person Fit
+
+Hieronder zijn de percentages van person-item-fit indices weergegeven. Hierbij een korte uitleg wat het exact betekent:
+- infit.outside: De infit (information-weighted fit) statistiek is gevoelig voor onverwacht gedrag dat invloed heeft op de antwoorden op items die de meeste informatie geven over het vaardigheidsniveau van de persoon. Met andere woorden, het is gevoeliger voor onverwachte antwoorden op items die dicht bij het vaardigheidsniveau van de persoon liggen. De infit.outside waarde in de tabel vertegenwoordigt de proportie van personen wiens infit statistiek buiten het acceptabele bereik valt, wat duidt op een slechte fit.
+- outfit.outside: De outfit (outlier-sensitive fit) statistiek is gevoelig voor onverwacht gedrag dat invloed heeft op de antwoorden op items die de minste informatie geven over het vaardigheidsniveau van de persoon. Met andere woorden, het is gevoeliger voor onverwachte antwoorden op items die ver van het vaardigheidsniveau van de persoon liggen. De outfit.outside waarde in de tabel vertegenwoordigt de proportie van personen wiens outfit statistiek buiten het acceptabele bereik valt, wat duidt op een slechte fit.
+
+```{r Betekenissen - person fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(person_fit)
+```
+
+Gezien zowel de infit en outfit statistieken boven 95 procent vallen, is er geen reden om aan te nemen dat de personen niet goed passen in het model. De proportie van personen wiens infit en outfit statistieken buiten het acceptabele bereik vallen, is verwaarloosbaar klein.
+
+#### Item Fit
+
+Hieronder bevinden zich de verschillende item fit indices. Hierbij een korte uitleg wat het exact betekent:
+
+- X2: Dit is de X2-statistiek van de item fit test. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het item niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+ 
+```{r Betekenissen - item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(item_fit)
+```
+
+Op basis van de resultaten, blijken 4 vragen niet goed te passen:
+
+- ASL_betekenissen_010
+- ASL_betekenissen_008
+- ASL_betekenissen_016
+- ASL_betekenissen_013
+
+Dit betekent dat deze waardes niet goed passen in het 1-factor IRT model.Als bepaalde waarden niet goed passen in dit model, kan dit verschillende dingen betekenen.
+Ten eerste kan het zijn dat de items niet allemaal dezelfde onderliggende eigenschap meten. Ten tweede kan het zijn dat sommige items verkeerd worden begrepen door de respondenten.
+Ten derde kan het zijn dat de veronderstelling van lokale onafhankelijkheid wordt geschonden. Dit betekent dat de reacties op de items afhankelijk zijn van elkaar, zelfs na controle voor de onderliggende eigenschap. Bijvoorbeeld, als het beantwoorden van het ene item helpt bij het beantwoorden van een ander item, dan zullen deze items niet goed passen in het model.
+Om een beter beeld te krijgen, volgen hieronder the item parameters van de vragen.
+
+```{r Betekenissen - item parameters, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(params)
+```
+
+Op basis van de factor loadings, blijken 3 vragen niet goed te passen:
+
+- ASL_betekenissen_008: 0.2941963
+- ASL_betekenissen_015: 0.2504362
+- ASL_betekenissen_002: 0.1635876
+
+In IRT, meet een factor loading (ook bekend als een discriminatieparameter) hoe goed een item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Een hoge factor loading betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+Het belangrijkste verschil met factor analyse, is dat in IRT, de factor loadings ook rekening houden met de moeilijkheidsgraad van de items. Dit betekent dat items die dezelfde moeilijkheidsgraad hebben (dat wil zeggen, ze zijn even moeilijk om te beantwoorden) worden geacht dezelfde hoeveelheid informatie te geven over de onderliggende eigenschap, ongeacht hun factor loadings. Dit is niet het geval in factoranalyse, waar de factor loadings alleen de relatie tussen de geobserveerde variabelen en de onderliggende factor meten.
+Tevens kan het zijn dat de factor loadings en de item parameters niet overeenkomen. Bijvoorbeeld een item kan een hoge factor loading hebben (wat aangeeft dat het goed discrimineert) maar toch een slechte fit hebben (X2-statistiek) als het bijvoorbeeld verkeerd wordt begrepen door de respondenten. Omgekeerd kan een item goed passen bij het model maar niet goed discrimineren tussen verschillende niveaus van de eigenschap.
+
+##### Item Characteristic Curves
+
+Hieronder bevinden zich de item characteristic curves. Hierbij een korte uitleg wat het exact betekent:
+
+- De lijnen geven de item characteristic curves weer. Dit is de kans dat een persoon met een bepaald niveau van de onderliggende eigenschap het item correct beantwoordt. Hoe hoger de curve, hoe groter de kans dat een persoon met een bepaald niveau van de onderliggende eigenschap het item correct beantwoordt.
+- De x-as van de curve vertegenwoordigt het niveau van de onderliggende eigenschap (bijvoorbeeld vaardigheid of kennis) die een persoon heeft, terwijl de y-as de kans vertegenwoordigt dat een persoon het item correct beantwoordt.
+- Hoe stijler de ICC-lijn is, hoe beter het item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Dit betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+- Hoe hoger het y-axale middelpunt, hoe moeilijker het item is. 
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs/betekenissen_ICC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs/betekenissen_ICC_separate.png)
+
+##### Item Information Curves
+
+Hieronder bevinden zich de item information curves. Hierbij een korte uitleg wat het exact betekent:
+
+- De lijnen geven de item information curves weer. Dit is de hoeveelheid informatie die een item geeft over de onderliggende eigenschap. Hoe hoger de curve, hoe meer informatie het item geeft over de onderliggende eigenschap.
+- Hoe verder naar rechts de piek van de curve ligt, hoe meer informatie het item geeft over hooge niveaus van de onderliggende eigenschap. 
+- Hoe verder naar links de piek van de curve ligt, hoe meer informatie het item geeft over lage niveaus van de onderliggende eigenschap.
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs/betekenissen_IIC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs/betekenissen_IIC_separate.png)
+
+
+##### Item Person Map
+
+Hieronder bevindt zich de item person map. Hierbij een korte uitleg wat het exact betekent:
+
+- De x-as van de grafiek vertegenwoordigt het niveau van de onderliggende eigenschap (bijvoorbeeld vaardigheid of kennis) die een persoon heeft, terwijl de y-as de hoeveelheid participanten vertegenwoordigt.
+- Onder de grafiek kan bekeken worden welke vraag ongeveer bij welke hoogte van onderliggende eigenschap past, en hoeveel leerlingen hier daadwerkelijk bij horen.
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs/betekenissen_item_person_fit.png)
+
+
+##### Test Characteristic and Information Curves
+
+Gelijk aan de Item characteristics en information curves, maar dan voor de test als geheel. Hierbij een korte uitleg wat het exact betekent:
+
+- De lijnen geven de test characteristic curves weer. Deze geeft aan hoe goed de test informatie geeft over de onderliggende eigenschap. Hoe hoger de curve, hoe meer informatie de test geeft over de onderliggende eigenschap op dat niveau.
+- Grofweg kunnen de lijnen en de curve gezien woren als een amalgamatie van de onderliggende item characteristic en information curves.
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs/betekenissen_TCC.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/irt_analyses`r format(Sys.Date(), "%Y")`/irt_graphs/betekenissen_TIC.png)
+
+### Cijfers
+
+### Componenten
+
+### figuren
+
+### getallen
+
+### Leestekens
+
+### Lezen Deel 1
+
+### Lezen Deel 2
+
+### Opzoeken
+
+### Sommen Maken
+
+### Spelling
+
+### Verbanden
+
+### Verhoudingen
+
+### Verschillen
+
+### Werkwoordspelling
+
+### Woorden
+
+### Woorden Relateren
