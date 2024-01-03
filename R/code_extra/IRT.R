@@ -86,7 +86,7 @@ dir.create(graph_subdirectory)
 
 
 
-# Data Analyses ####
+# Data Analyses - Main ####
 irt_fits <- list() # Create an empty list to store the irt_fit objects
 
 ## Loop through the data frames ####
@@ -117,58 +117,61 @@ for (df in data_frame_names) {
 
 # Data Analyses - Explication ####
 for (i in seq_along(irt_fits)) {
-  print(i)
+  ## Get the fit object ####
   fit <- irt_fits[[i]]
 
-  name <- names(irt_fits)[i] # Get the name of the fit
+  ## Get the name of the fit ####
+  name <- names(irt_fits)[i]
 
+  ## Get the parameters ####
   params <- coef(fit, IRTpars = TRUE, simplify = TRUE)
 
-  # Item characteristics curves, separate
+  ## Create and save Graphs ####
+  ### Item characteristics curves, separate ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_separate.png"))
   plot <- tracePlot(fit)
   print(plot)
   dev.off()
 
-  # Item charactfristics curves, combined
+  ### Item charactfristics curves, combined ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_ICC_combined.png"))
   plot <- tracePlot(fit, facet = FALSE, legend = TRUE)
   plot <- plot + scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
   print(plot)
   dev.off()
 
-  # Item info curve, separate
+  ### Item info curve, separate ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_separate.png"))
   plot <- itemInfoPlot(fit, facet = TRUE)
   print(plot)
   dev.off()
 
-  # Item info curve, combined
+  ### Item info curve, combined ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_IIC_combined.png"))
   plot <- itemInfoPlot(fit, legend = TRUE)
   plot <- plot + scale_color_manual(values = randomColor(length(params$items))) # Use random colors for each item
   print(plot)
   dev.off()
 
-  # Item fit
+  ### Item fit ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_fit.png"))
   plot <- itemfitPlot(fit)
   print(plot)
   dev.off()
 
-  # Item-Person fit
+  ### Item-Person fit ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_person_fit.png"))
   plot <- itempersonMap(fit)
   print(plot)
   dev.off()
 
-  # Test information curve
+  ### Test information curve ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TIC.png"))
   plot <- testInfoPlot(fit, adj_factor = 2)
   print(plot)
   dev.off()
 
-  # Test characteristic curve
+  ### Test characteristic curve ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_TCC.png"))
   plot <- scaleCharPlot(fit)
   print(plot)
