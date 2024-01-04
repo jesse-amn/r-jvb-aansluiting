@@ -106,6 +106,13 @@ for (df in data_frame_names) {
     emcycles = 500, # Increase the maximum number of EM cycles to N
   )
 
+  ### Item fit Plot ####
+  # For whatever reason, this plot needs to be made directly with the object (i.e., the object cannot be stored prior to making the plot)
+  png(file = paste0(normalizePath(graph_subdirectory), "/", df, "_item_fit.png"), width = 1200, height = 800)
+  plot <- itemfitPlot(irt_fit)
+  print(plot)
+  dev.off()
+
   ### Store irt_fit object ####
   irt_fits[[df]] <- irt_fit # Store the irt_fit object in the list
   saveRDS(irt_fit, file = paste0("./data/irt_analyses", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
@@ -154,12 +161,6 @@ for (i in seq_along(irt_fits)) {
   print(plot)
   dev.off()
 
-  ### Item fit ####
-  png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_fit.png"), width = 1200, height = 800)
-  plot <- itemfitPlot(fit)
-  print(plot)
-  dev.off()
-
   ### Item-Person fit ####
   png(file = paste0(normalizePath(graph_subdirectory), "/", name, "_item_person_fit.png"), width = 1200, height = 800)
   plot <- itempersonMap(fit)
@@ -178,9 +179,6 @@ for (i in seq_along(irt_fits)) {
   print(plot)
   dev.off()
 }
-
-
-
 
 
 # Data Finalization ####
