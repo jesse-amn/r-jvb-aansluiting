@@ -74,7 +74,7 @@ data_frames <- sapply(initial_env, function(x) {
 
 ### Filter names ####
 data_frame_names <- initial_env[data_frames]
-data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|gedrag|interesse", data_frame_names)]
+data_frame_names <- data_frame_names[!grepl("meta_df|gedrag|interesse", data_frame_names)]
 
 # Remove df from recommended_factors if it exists
 data_frame_names <- setdiff(data_frame_names, c("recommended_factors", "local_df"))
@@ -104,7 +104,7 @@ recommended_factors$scree_pc_eigen <- NA
 recommended_factors$parallel <- NA
 
 
-
+componenten$asl
 
 
 # Data Analyses - Main ####
@@ -128,7 +128,7 @@ for (df in data_frame_names) {
   ]
   # Remove items with extreme missingness.
   local_df <- local_df[
-    , !grepl("ASL_componenten_21|ASL_componenten_11", colnames(local_df))
+    , !grepl("ASL_componenten_11", colnames(local_df))
   ]
 
   # Remove empty variables

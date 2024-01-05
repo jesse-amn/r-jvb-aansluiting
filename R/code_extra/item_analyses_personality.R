@@ -109,21 +109,6 @@ graph_subdirectory <- paste0(subdirectory, "/graphs")
 dir.create(graph_subdirectory)
 
 
-
-
-
-# gedrag_houding_model <- "betrokkenheid_thuis =~ ASL_pers_lln_001_betrokkenheid_thuis + ASL_pers_lln_004_betrokkenheid_thuis + ASL_pers_lln_002_betrokkenheid_thuis + ASL_pers_lln_003_betrokkenheid_thuis + ASL_pers_lln_005_betrokkenheid_thuis + ASL_pers_lln_006_betrokkenheid_thuis + ASL_pers_lln_007_betrokkenheid_thuis + ASL_pers_lln_087_pilot_betrokkenheid_thuis_NEW + ASL_pers_lln_088_pilot_betrokkenheid_thuis_NEW + ASL_pers_lln_089_pilot_betrokkenheid_thuis_NEW
-#  concentratie =~ ASL_pers_lln_008_concentratie + ASL_pers_lln_009_concentratie + ASL_pers_lln_010_concentratie + ASL_pers_lln_011_concentratie + ASL_pers_lln_012_concentratie + ASL_pers_lln_013_concentratie + ASL_pers_lln_014_concentratie + ASL_pers_lln_015_concentratie + ASL_pers_lln_016_concentratie + ASL_pers_lln_017_concentratie + ASL_pers_lln_090_pilot_concentratie_NEW + ASL_pers_lln_091_pilot_concentratie_NEW
-#  contact_met_leeftijdsgenoten =~ ASL_pers_lln_018_contact_met_leeftijdsgenoten + ASL_pers_lln_019_contact_met_leeftijdsgenoten + ASL_pers_lln_020_contact_met_leeftijdsgenoten + ASL_pers_lln_021_contact_met_leeftijdsgenoten + ASL_pers_lln_022_contact_met_leeftijdsgenoten + ASL_pers_lln_023_contact_met_leeftijdsgenoten + ASL_pers_lln_024_contact_met_leeftijdsgenoten + ASL_pers_lln_092_pilot_contact_met_leeftijdsgenoten_NEW + ASL_pers_lln_093_pilot_contact_met_leeftijdsgenoten_NEW
-#  interesse_in_schoolvakken
-#  motivatie_om_te_presteren =~ ASL_pers_lln_034_motivatie_om_te_presteren + ASL_pers_lln_035_motivatie_om_te_presteren + ASL_pers_lln_036_motivatie_om_te_presteren + ASL_pers_lln_037_motivatie_om_te_presteren + ASL_pers_lln_038_motivatie_om_te_presteren + ASL_pers_lln_039_motivatie_om_te_presteren + ASL_pers_lln_040_motivatie_om_te_presteren + ASL_pers_lln_041_motivatie_om_te_presteren + ASL_pers_lln_096_pilot_motivatie_om_te_presteren_NEW + ASL_pers_lln_097_pilot_motivatie_om_te_presteren_NEW + ASL_pers_lln_098_pilot_motivatie_om_te_presteren_NEW + ASL_pers_lln_099_pilot_motivatie_om_te_presteren_NEW + ASL_pers_lln_100_pilot_motivatie_om_te_presteren_NEW
-#  samenwerken =~ ASL_pers_lln_042_samenwerken + ASL_pers_lln_043_samenwerken + ASL_pers_lln_044_samenwerken + ASL_pers_lln_045_samenwerken + ASL_pers_lln_046_samenwerken + ASL_pers_lln_047_samenwerken + ASL_pers_lln_048_samenwerken + ASL_pers_lln_049_samenwerken + ASL_pers_lln_050_samenwerken + ASL_pers_lln_104_pilot_samenwerken_NEW + ASL_pers_lln_105_pilot_samenwerken_NEW
-#  zelfvertrouwen =~ ASL_pers_lln_051_zelfvertrouwen + ASL_pers_lln_052_zelfvertrouwen + ASL_pers_lln_053_zelfvertrouwen + ASL_pers_lln_054_zelfvertrouwen + ASL_pers_lln_055_zelfvertrouwen + ASL_pers_lln_056_zelfvertrouwen + ASL_pers_lln_057_zelfvertrouwen + ASL_pers_lln_058_zelfvertrouwen + ASL_pers_lln_107_pilot_zelfvertrouwen_NEW + ASL_pers_lln_108_pilot_zelfvertrouwen_NEW + ASL_pers_lln_109_pilot_zelfvertrouwen_NEW + ASL_pers_lln_110_pilot_zelfvertrouwen_NEW
-#  stabiel =~ ASL_pers_lln_059_stabiel + ASL_pers_lln_060_stabiel + ASL_pers_lln_061_stabiel + ASL_pers_lln_062_stabiel + ASL_pers_lln_063_stabiel + ASL_pers_lln_064_stabiel + ASL_pers_lln_065_stabiel + ASL_pers_lln_066_stabiel + ASL_pers_lln_067_stabiel + ASL_pers_lln_106_pilot_stabiel_NEW
-#  zorgvuldig =~ ASL_pers_lln_068_zorgvuldig + ASL_pers_lln_069_zorgvuldig + ASL_pers_lln_070_zorgvuldig + ASL_pers_lln_071_zorgvuldig + ASL_pers_lln_072_zorgvuldig + ASL_pers_lln_073_zorgvuldig + ASL_pers_lln_074_zorgvuldig + ASL_pers_lln_075_zorgvuldig + ASL_pers_lln_076_zorgvuldig + ASL_pers_lln_111_pilot_zorgvuldig_NEW + ASL_pers_lln_112_pilot_zorgvuldig_NEW + ASL_pers_lln_113_pilot_zorgvuldig_NEW
-#  open =~ ASL_pers_lln_077_open + ASL_pers_lln_078_open + ASL_pers_lln_079_open + ASL_pers_lln_080_open + ASL_pers_lln_081_open + ASL_pers_lln_082_open + ASL_pers_lln_084_open + ASL_pers_lln_083_open + ASL_pers_lln_085_open + ASL_pers_lln_101_pilot_open_NEW + ASL_pers_lln_102_pilot_open_NEW + ASL_pers_lln_103_pilot_open_NEW
-#  "
-
 # Create list to save factor analyses
 factor_analyses <- list()
 irt_fits <- list() # Create an empty list to store the irt_fit objects
@@ -217,7 +202,7 @@ for (df in data_frame_names) {
     ### Store irt_fit object ####
     irt_fits[[paste0(df, "_", var, "_irt_fit")]] <- irt_fit # Store the irt_fit object in the list
   }
-  saveRDS(irt_fit, file = paste0("./data/item_analyses_pers", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
+  saveRDS(irt_fits, file = paste0("./data/item_analyses_pers", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
   ### Remove local objects ####
   rm(local_df)
 }

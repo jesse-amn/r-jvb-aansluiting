@@ -76,7 +76,7 @@ data_frames <- sapply(initial_env, function(x) {
 
 ### Filter names ####
 data_frame_names <- initial_env[data_frames]
-data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde", data_frame_names)]
+data_frame_names <- data_frame_names[!grepl("meta_df", data_frame_names)]
 # names <- names[!grepl("meta|metenenmeetkunde|woordenrelateren", names)] # TODO: these did not work yet.
 
 # Remove df from recommended_factors if it exists

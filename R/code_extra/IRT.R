@@ -72,7 +72,7 @@ data_frames <- sapply(initial_env, function(x) {
 
 ### Filter names ####
 data_frame_names <- initial_env[data_frames]
-data_frame_names <- data_frame_names[!grepl("meta_df|metenenmeetkunde|gedrag_houding|interesse", data_frame_names)]
+data_frame_names <- data_frame_names[!grepl("meta_df|gedrag_houding|interesse", data_frame_names)]
 data_frame_names <- data_frame_names[data_frame_names != "local_df" & data_frame_names != "recommended_factors"]
 
 
