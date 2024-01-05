@@ -130,6 +130,10 @@ if (item_analyses == TRUE) {
   sink("/dev/null")
   suppressWarnings(suppressMessages(source(paste0("./R/code_extra/IRT.R"), echo = FALSE)))
   sink()
+
+  sink("/dev/null")
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/item_analyses_personality.R"), echo = FALSE)))
+  sink()
 }
 
 
