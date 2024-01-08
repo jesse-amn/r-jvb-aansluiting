@@ -364,9 +364,9 @@ for (df in data_frame_names) {
     ### Store irt_fit object ####
     irt_fits[[paste0(df, "_", var, "_irt_fit")]] <- irt_fit # Store the irt_fit object in the list
   }
-  saveRDS(irt_fit, file = paste0("./data/item_analyses_pers", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
+  saveRDS(irt_fits, file = paste0("./data/item_analyses_pers", format(Sys.Date(), "%Y"), "/irt_fit_", df, ".rds"))
   ### Remove local objects ####
-  rm(local_df)
+  # rm(local_df)
 }
 
 # Data Analyses - Explication ####
