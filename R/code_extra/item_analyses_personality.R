@@ -81,6 +81,8 @@ for (df in list.files("./data/data_interrim", pattern = ".csv", full.names = TRU
   rm(df)
 }
 
+recommended_factors <- read.csv(paste0("./data/factor_analyses_simple", format(Sys.Date(), "%Y"), "/recommended_factors.csv"))
+
 # Data Preparation ####
 ## Get object names ####
 ### Capture the state of the global environment at the start of the script ####
@@ -309,12 +311,12 @@ for (df in data_frame_names) {
 
   # Create lavaan model
   model <- generate_cfa_model(list(
-    betrokkenheid_thuis = colnames(local_df[grepl("realistisch", colnames(local_df))]),
-    concentratie = colnames(local_df[grepl("conventioneel", colnames(local_df))]),
-    contact_met_leeftijdsgenoten = colnames(local_df[grepl("ondernemend", colnames(local_df))]),
-    interesse_in_schoolvakken = colnames(local_df[grepl("intellectueel", colnames(local_df))]),
-    motivatie_om_te_presteren = colnames(local_df[grepl("artistiek", colnames(local_df))]),
-    samenwerken = colnames(local_df[grepl("sociaal", colnames(local_df))])
+    realistisch = colnames(local_df[grepl("realistisch", colnames(local_df))]),
+    conventioneel = colnames(local_df[grepl("conventioneel", colnames(local_df))]),
+    ondernemend = colnames(local_df[grepl("ondernemend", colnames(local_df))]),
+    intellectueel = colnames(local_df[grepl("intellectueel", colnames(local_df))]),
+    artistiek = colnames(local_df[grepl("artistiek", colnames(local_df))]),
+    sociaal = colnames(local_df[grepl("sociaal", colnames(local_df))])
   ))
 
   # Save factor analyses to list

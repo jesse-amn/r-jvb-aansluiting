@@ -236,31 +236,3 @@ rm(list = ls())
 
 
 # File Report ####
-' pkg_loader("lavaan")
-
-
-# Define your model
-model <- "
-  f1 =~ ASL_betekenissen_001 + ASL_betekenissen_004 + ASL_betekenissen_005 +
-      ASL_betekenissen_003 + ASL_betekenissen_007 +
-      ASL_betekenissen_006 + ASL_betekenissen_002 + ASL_betekenissen_012 +
-      ASL_betekenissen_008 + ASL_betekenissen_010 + ASL_betekenissen_011 +
-      ASL_betekenissen_014 + ASL_betekenissen_009 + ASL_betekenissen_013 +
-      ASL_betekenissen_015 + ASL_betekenissen_016
-      "
-
-
-
-
-
-
-# Fit the model with missing data using full information maximum likelihood (FIML)
-fit <- cfa(model, data = betekenissen, missing = "FIML")
-
-summary(fit, standardized = TRUE, fit.measures = TRUE)
-
-factor_loadings <- lavInspect(fit, "std")$lambda
-factor_loadings <- factor_loadings[order(factor_loadings,d), ]
-factor_loadings
-
-'

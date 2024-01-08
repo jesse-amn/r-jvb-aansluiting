@@ -86,6 +86,9 @@ for (name in basename(file_list) %>% gsub(".csv", "", .)) {
   # Remove ".SCORE" from column names
   colnames(df) <- gsub("_item.SCORE|_item.SCORES", "", colnames(df))
 
+  # Remove questions ending on MM (only applicable for metenenmeetkunde)
+  df <- df[, !grepl("MM$|MM_NEW$", colnames(df))]
+
   assign(name, df, envir = .GlobalEnv)
 }
 rm(name, df)
@@ -94,6 +97,8 @@ rm(name, df)
 woordenrelateren[is.na(woordenrelateren)] <- 0
 sommenmaken$ASL_sommenmaken_012_NEW[is.na(sommenmaken$ASL_sommenmaken_012_NEW)] <- 0
 
+# Remove rows of impossible values in metenenmeetkunde
+metenenmeetkunde <- metenenmeetkunde[apply(metenenmeetkunde[, grepl("^ASL", colnames(metenenmeetkunde))], 1, function(x) all(x %in% c(0, 1))), ]
 
 '
 colnames(metenenmeetkunde)

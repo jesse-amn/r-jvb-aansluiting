@@ -104,9 +104,6 @@ recommended_factors$scree_pc_eigen <- NA
 recommended_factors$parallel <- NA
 
 
-componenten$asl
-
-
 # Data Analyses - Main ####
 ## Factor Analyses ####
 for (df in data_frame_names) {
@@ -127,9 +124,9 @@ for (df in data_frame_names) {
     , !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(local_df))
   ]
   # Remove items with extreme missingness.
-  local_df <- local_df[
-    , !grepl("ASL_componenten_11", colnames(local_df))
-  ]
+  # local_df <- local_df[
+  #   , !grepl("ASL_componenten_11", colnames(local_df))
+  # ]
 
   # Remove empty variables
   local_df <- local_df[, colSums(is.na(local_df)) != nrow(local_df)]
@@ -176,7 +173,6 @@ for (df in data_frame_names) {
   # Remove df from global environment
   # rm(scree_plot, scree_parallel_plot)
 }
-
 
 # create subdirectory for alternative factor analyses
 alt_fac_name <- paste0("./data/factor_analyses", format(Sys.Date(), "%Y"), "/alternative_factors")
@@ -256,31 +252,3 @@ rm(list = ls())
 
 
 # File Report ####
-' pkg_loader("lavaan")
-
-
-# Define your model
-model <- "
-  f1 =~ ASL_betekenissen_001 + ASL_betekenissen_004 + ASL_betekenissen_005 +
-      ASL_betekenissen_003 + ASL_betekenissen_007 +
-      ASL_betekenissen_006 + ASL_betekenissen_002 + ASL_betekenissen_012 +
-      ASL_betekenissen_008 + ASL_betekenissen_010 + ASL_betekenissen_011 +
-      ASL_betekenissen_014 + ASL_betekenissen_009 + ASL_betekenissen_013 +
-      ASL_betekenissen_015 + ASL_betekenissen_016
-      "
-
-
-
-
-
-
-# Fit the model with missing data using full information maximum likelihood (FIML)
-fit <- cfa(model, data = betekenissen, missing = "FIML")
-
-summary(fit, standardized = TRUE, fit.measures = TRUE)
-
-factor_loadings <- lavInspect(fit, "std")$lambda
-factor_loadings <- factor_loadings[order(factor_loadings,d), ]
-factor_loadings
-
-'

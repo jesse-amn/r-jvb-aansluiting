@@ -4158,8 +4158,868 @@ params
 
 #### Factor Analyse
 
-#### Item Response Analyse
+```{r interesse - stat extraction, echo=FALSE, message=FALSE, warning=FALSE}
+fit <- fitMeasures(interesse$interesse)
 
+# null hypothesis: empirical chi-square
+
+
+p <- round(fit["pvalue"][[1]], 3)
+chisq <- fit["chisq"][[1]]
+
+# model fit indices
+rmsea <- fit["rmsea"][[1]] # < .06 or .08
+p_rmsea <- fit["rmsea.pvalue"][[1]] # > .05
+tli <- fit["tli"][[1]] # > 0.95
+rms <- fit["crmr"][[1]] # correct RMS, < 0.08
+cfi <- fit["cfi"][[1]] # > 0.90
+
+# N
+lavInspect(interesse$interesse, what = "nobs")
+
+# Explained variance
+r2 <- inspect(interesse$interesse, what = "r2")
+
+# Factor loadings
+loadings <- parameterEstimates(interesse$interesse)[parameterEstimates(interesse$interesse)$op == "=~", ][c("rhs", "est")]
+weights <- inspect(interesse$interesse, what = "std")[["lambda"]] # These are the factor score coefficients, which are used to compute factor scores for each observation in your data.
+```
+
+##### Model Beoordeling
+
+Hieronder volgen alle model fit van de factor analyse voor interesse. Hierbij moet rekening gehouden worden dat de factor analyses expliciet gemaakt zijn met 10 factoren,
+en de onderliggende bijbehorende vragen alleen laden op de voor ingestelde factor. 
+
+> @FLEUR: dit kan ik ook veranderen. m.a.w. dat ze wel op meerdere factoren laden. Dit geldt ook voor alle andere factor analyses. Maar ik het het nu zo gedaan
+> om een wat globaler beeld te krijgen. Vaak zijn vragen die op deze manier slecht laden beter behorend bij andere factoren. Dit zou ik dan op jouw aanraden nog kunnen onderzoeken.
+  
+Hieronder, in tabel 2, zie je de model-fit statistieken van de CFA voor betekenissen. Hierbij een korte uitleg wat het exact betekent:
+
+- p-value: de p-waarde van de empirische chi-square. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CRMS: de Corrected Root Mean Square. Dit kwantificeert het gemiddelde verschil tussen waargenomen en voorspelde waarden in een model. Het geeft een maat voor hoe goed de voorspellingen van het model overeenkomen met de daadwerkelijke gegevens. Lagere RMRS-waarden geven een betere overeenkomst aan, wat wijst op een nauwkeuriger model.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+
+
+**Tabel 2: Betekenissen - Model-fit statistieken**
+
+```{r interesse - model fit table, echo=FALSE, message=FALSE, warning=FALSE}
+# Create dataframe
+df <- data.frame(
+  Statistic_Name = c("p-value", "RMSEA", "TLI", "CRMS", "CFI"),
+  Result = c(p, rmsea, tli, rms, cfi),
+  Cut_off = c("> .05", "< .05 | .05 - .1 | > .1", "> .95 | .90 - .95 | < .90", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90"),
+  Conclusion = c("Poor", "Acceptabel", "Poor", "Good", "Poor")
+)
+
+# Create table
+knitr::kable(df, col.names = c("Statistic", "Result", "Cut-off", "Conclusion"))
+```
+
+
+De model-fit resultaten zijn niet heel positief.
+Gezien de gevoeligheid van p-waardes in empirische chi-square testen, en de hoge hoeveelheid observaties, is het verstandiger
+de andere fit indexen te hanteren.
+
+Als conclusie hier is dat het model goed past, en (dus) een factor voldoende is.
+
+
+##### Item Beoordeling
+
+Hieronder staan de factor loadings, factor weights, communalities, en uniquenesses weergegeven. Hieronder een beknopte uitleg van wat deze waarden betekenen:
+
+- Factor loadings: de factor loadings geven aan hoe sterk een item correleert met een factor. Hoe hoger de factor loading, hoe sterker de correlatie. Een factor loading van .3 of hoger wordt gezien als een goede factor loading.
+- Factor weights: de factor weights geven aan hoeveel gewicht een item heeft op een factor. Deze wordt gebruikt om de factor scores te berekenen. Hoe hoger de factor weight, hoe meer gewicht een item heeft op een factor.
+
+
+**Tabel 3: Betekenissen - Model-fit statistieken**
+
+```{r interesse - Item loadings, echo=FALSE, message=FALSE, warning=FALSE}
+# Create dataframe
+
+# Create table
+loadings <- loadings[order(loadings$est, decreasing = TRUE), ]
+knitr::kable(loadings, col.names = c("Naam", "std. Factor Loading"))
+```
+
+Op basis van de factor loadings en de communality/uniqueness waardes, kunnen twee reccomendaties gemaakt worden.
+Een factor loading van een vraag wordt als "goed" gezien zodra deze hoger ligt dan .3. Dit is bij meerdere vragen
+niet het geval. Specifiek gaat dit om de volgende vragen (van hoogste naar laagste):
+
+- ASL_interesse_049_sociaal_1    : 0.2675367
+- ASL_interesse_002_realistisch_1: 0.1673608
+- ASL_interesse_001_realistisch_1: 0.1656952
+
+Hier volgen nog de gewichten van alle vragen op diens eigen factoren:
+
+**Tabel 4: Betekenissen - Model-fit statistieken**
+
+```{r interesse - Weights, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(weights)
+```
+
+
+Zie figuur 3 voor een grafische weergave:
+
+**Figuur 3: Factor Loadings Betekenissen**
+
+```{r interesse - factor loadings plot, echo=FALSE, message=FALSE, warning=FALSE}
+plot <- plot(loadings$est)
+plot <- lines(loadings$est)
+plot <- abline(h = 0.3, lty = 2) # lty = 2 makes the line dashed
+plot <- title(main = "Factor Loadings Betekenissen", sub = "Item factor loadings; order based on item factor loadings order")
+```
+
+
+#### Item Response Analyse
+```{r interesse  - load data, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# load data
+irt_fit <- readRDS(paste0(here(), "/data/item_analyses_pers2024/irt_fit_interesse.rds"))
+data <- read.csv(paste0(here(), "/data/data_interrim/interesse.csv"))
+```
+
+##### Realistisch
+
+```{r interesse realistisch - stat extraction, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Model fit
+fit <- irt_fit$interesse_realistisch_irt_fit
+
+# model_fit <- as.data.frame(M2(fit, na.rm = TRUE))
+# model_fit <- cbind(model_fit, nrow(data))
+# model_fit <- rename(model_fit, `N` = `nrow(data)`)
+# model_fit <- tidyr::pivot_longer(model_fit, cols = -N, names_to = "Fit Index", values_to = "Value")
+# model_fit <- dplyr::select(model_fit, `Fit Index`, Value)
+# model_fit$`Cut-Off` <- c("", "", "> .05", "< .05 | .05 - .1 | > .1", "", "", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90", "> .95 | .90 - .95 | < .90")
+
+# item fit
+# item_fit <- itemfit(fit, na.rm = TRUE, fit_stats = "PV_Q1")
+# colnames(item_fit) <- c("Item", "X2", "df", "RMSEA", "p")
+# item_fit <- item_fit[order(item_fit$X2), ]
+# rownames(item_fit) <- NULL
+
+robust_item_fit <- itemfit(fit, na.rm = TRUE)
+colnames(robust_item_fit) <- c("Item", "PV_Q1", "df", "RMSEA", "p")
+robust_item_fit <- robust_item_fit[order(robust_item_fit$PV_Q1), ]
+rownames(robust_item_fit) <- NULL
+
+# Item parameters
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+params <- params[, -which(colnames(params) %in% c("items.g", "items.u", "means", "F1"))]
+sink("/dev/null")
+sum <- suppressWarnings(suppressMessages(summary(fit, silent = TRUE)))
+sink()
+params <- cbind(params, sum$rotF)
+params <- cbind(params, sum$h2)
+params <- params[, c("F1", colnames(params)[-which(colnames(params) %in% "F1")])]
+colnames(params) <- c("Factor Loading", "Discrimination Parameter", "Difficulty Parameter 1", "Difficulty Parameter 2", "Difficulty Parameter 3", "Difficulty Parameter 4", "Communalities")
+params <- params[order(params$`Factor Loading`, decreasing = TRUE), ]
+
+
+# # Differential Item Functionining DIF
+# # Prepare the data
+# gender <- data$gender
+# gender <- dplyr::recode(gender, "Man" = 1, "Vrouw" = 2, "Onbekend" = 2)
+# gender <- as.factor(gender)
+# local_df <- data[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(data))]
+
+# # Fit the multiple group model
+# dif_fit <- mirt::multipleGroup(
+#   data = local_df,
+#   model = 1,
+#   group = gender
+# )
+
+# # Perform DIF analysis
+# dif <- mirt::DIF(dif_fit, group = gender, which.par = c("a1", "d"), na.rm = TRUE, plotdif = TRUE)
+
+# person fit
+# person_fit <- personfit(fit) %>%
+#   reframe(
+#     infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+#     outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+#   ) # lower row = non-fitting people
+# person_fit$Correct <- c("Correct", "Incorrect")
+# person_fit <- person_fit %>% dplyr::select(Correct, everything())
+```
+
+###### Model Fit
+
+Hieronder bevinden zich de verschillende model fit indices.Hierbij een korte uitleg wat het exact betekent:
+
+- M2: Dit is de M2-statistiek van Maydeu-Olivares, die een maat is voor de absolute fit van het model. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+  - RMSEA_5 en RMSEA_95: de 95% betrouwbaarheidsinterval van de RMSEA. Hoe kleiner dit interval rondom de RMSEA waarde, hoe zekerder we zijn van die waarde. 
+- SRMSR: SRMSR staat voor "Standardized Root Mean Square Residual". Het is een maat voor de gemiddelde discrepantie tussen de waargenomen en voorspelde covarianties. Een lagere waarde duidt op een betere fit. Een SRMSR van minder dan 0.08 wordt over het algemeen als goed beschouwd.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- N: het aantal respondenten in de steekproef.
+
+```{r interesse realistisch - model fit, echo=FALSE, message=FALSE, warning=FALSE}
+# model_fit$`Conclusion` <- c("", "", "Poor", "Acceptable", "", "", "Good", "Poor", "Poor")
+# knitr::kable(model_fit)
+```
+
+###### Item Fit
+
+Hieronder bevinden zich de verschillende item fit indices. Hierbij een korte uitleg wat het exact betekent:
+
+- X2: Dit is de X2-statistiek van de item fit test. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het item niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+ 
+```{r interesse realistisch - item fit, echo=FALSE, message=FALSE, warning=FALSE}
+# knitr::kable(item_fit)
+```
+
+
+Als bepaalde waarden niet goed passen in dit model, kan dit verschillende dingen betekenen.
+Ten eerste kan het zijn dat de items niet allemaal dezelfde onderliggende eigenschap meten. Ten tweede kan het zijn dat sommige items verkeerd worden begrepen door de respondenten.
+Ten derde kan het zijn dat de veronderstelling van lokale onafhankelijkheid wordt geschonden. Dit betekent dat de reacties op de items afhankelijk zijn van elkaar, zelfs na controle voor de onderliggende eigenschap. Bijvoorbeeld, als het beantwoorden van het ene item helpt bij het beantwoorden van een ander item, dan zullen deze items niet goed passen in het model.
+
+Hieronder volgt een robuste variant van de X2 test, namelijk de PV_Q1 test. Hieronder volgt een korte uitleg wat het exact betekent:
+
+De 'PV_Q1'-statistiek is een afgeleide versie van de Q1-statistiek, een chi-kwadraatstatistiek gebruikt in item respons theorie (IRT) modellen om te testen of een item goed past bij het model. 
+Een hoge 'PV_Q1'-waarde duidt op een slechte overeenkomst tussen de waargenomen gegevens en voorspellingen van het model, wat suggereert dat het item mogelijk niet conform het verwachte gedrag 
+volgens het IRT-model functioneert. Een niet-significante p-waarde, meestal p > 0.05, in combinatie met lage 'PV_Q1'- en RMSEA.PV_Q1-waarden, geeft aan dat het item goed past bij het IRT-model.
+Daarnaast is het belangrijk op te merken dat de 'PV_Q1'-statistiek robuust is tegen invloeden van steekproefomvang en lokale afhankelijkheid, waardoor het een betrouwbaar instrument is om de pasvorm
+van een item met het IRT-model te beoordelen, ongeacht de omvang van de steekproef of eventuele lokale onderlinge afhankelijkheden tussen de waarnemingen. Hieronder de resultaten:
+
+```{r interesse realistisch - robust item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(robust_item_fit)
+```
+
+Om een beter beeld te krijgen, volgen hieronder the item parameters van de vragen. 
+In IRT, meet een factor loading (ook bekend als een discriminatieparameter) hoe goed een item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Een hoge factor loading betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+Het belangrijkste verschil met factor analyse, is dat in IRT, de factor loadings ook rekening houden met de moeilijkheidsgraad van de items. Dit betekent dat items die dezelfde moeilijkheidsgraad hebben (dat wil zeggen, ze zijn even moeilijk om te beantwoorden) worden geacht dezelfde hoeveelheid informatie te geven over de onderliggende eigenschap, ongeacht hun factor loadings. Dit is niet het geval in factoranalyse, waar de factor loadings alleen de relatie tussen de geobserveerde variabelen en de onderliggende factor meten.
+Tevens kan het zijn dat de factor loadings en de item parameters niet overeenkomen. Bijvoorbeeld een item kan een hoge factor loading hebben (wat aangeeft dat het goed discrimineert) maar toch een slechte fit hebben (X2-statistiek) als het bijvoorbeeld verkeerd wordt begrepen door de respondenten. Omgekeerd kan een item goed passen bij het model maar niet goed discrimineren tussen verschillende niveaus van de eigenschap.
+In een Graded response model, zoals hier gebruikt, zijn er meerdere moeilijkheids parameters, een voor elke vrijheidsgraaad van de vraag (totaal antwoordmogelijk - 1). 
+
+```{r interesse realistisch - item parameters, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(params)
+```
+
+##### Conventioneel
+
+```{r interesse conventioneel - stat extraction, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Model fit
+fit <- irt_fit$interesse_conventioneel_irt_fit
+
+model_fit <- as.data.frame(M2(fit, na.rm = TRUE))
+model_fit <- cbind(model_fit, nrow(data))
+model_fit <- rename(model_fit, `N` = `nrow(data)`)
+model_fit <- tidyr::pivot_longer(model_fit, cols = -N, names_to = "Fit Index", values_to = "Value")
+model_fit <- dplyr::select(model_fit, `Fit Index`, Value)
+model_fit$`Cut-Off` <- c("", "", "> .05", "< .05 | .05 - .1 | > .1", "", "", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90", "> .95 | .90 - .95 | < .90")
+
+# item fit
+item_fit <- itemfit(fit, na.rm = TRUE, fit_stats = "PV_Q1")
+colnames(item_fit) <- c("Item", "X2", "df", "RMSEA", "p")
+item_fit <- item_fit[order(item_fit$X2), ]
+rownames(item_fit) <- NULL
+
+robust_item_fit <- itemfit(fit, na.rm = TRUE)
+colnames(robust_item_fit) <- c("Item", "PV_Q1", "df", "RMSEA", "p")
+robust_item_fit <- robust_item_fit[order(robust_item_fit$PV_Q1), ]
+rownames(robust_item_fit) <- NULL
+
+# Item parameters
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+params <- params[, -which(colnames(params) %in% c("items.g", "items.u", "means", "F1"))]
+sink("/dev/null")
+sum <- suppressWarnings(suppressMessages(summary(fit, silent = TRUE)))
+sink()
+params <- cbind(params, sum$rotF)
+params <- cbind(params, sum$h2)
+params <- params[, c("F1", colnames(params)[-which(colnames(params) %in% "F1")])]
+colnames(params) <- c("Factor Loading", "Discrimination Parameter", "Difficulty Parameter 1", "Difficulty Parameter 2", "Difficulty Parameter 3", "Difficulty Parameter 4", "Communalities")
+params <- params[order(params$`Factor Loading`, decreasing = TRUE), ]
+
+
+# # Differential Item Functionining DIF
+# # Prepare the data
+# gender <- data$gender
+# gender <- dplyr::recode(gender, "Man" = 1, "Vrouw" = 2, "Onbekend" = 2)
+# gender <- as.factor(gender)
+# local_df <- data[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(data))]
+
+# # Fit the multiple group model
+# dif_fit <- mirt::multipleGroup(
+#   data = local_df,
+#   model = 1,
+#   group = gender
+# )
+
+# # Perform DIF analysis
+# dif <- mirt::DIF(dif_fit, group = gender, which.par = c("a1", "d"), na.rm = TRUE, plotdif = TRUE)
+
+# person fit
+# person_fit <- personfit(fit) %>%
+#   reframe(
+#     infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+#     outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+#   ) # lower row = non-fitting people
+# person_fit$Correct <- c("Correct", "Incorrect")
+# person_fit <- person_fit %>% dplyr::select(Correct, everything())
+```
+
+###### Model Fit
+
+Hieronder bevinden zich de verschillende model fit indices.Hierbij een korte uitleg wat het exact betekent:
+
+- M2: Dit is de M2-statistiek van Maydeu-Olivares, die een maat is voor de absolute fit van het model. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+  - RMSEA_5 en RMSEA_95: de 95% betrouwbaarheidsinterval van de RMSEA. Hoe kleiner dit interval rondom de RMSEA waarde, hoe zekerder we zijn van die waarde. 
+- SRMSR: SRMSR staat voor "Standardized Root Mean Square Residual". Het is een maat voor de gemiddelde discrepantie tussen de waargenomen en voorspelde covarianties. Een lagere waarde duidt op een betere fit. Een SRMSR van minder dan 0.08 wordt over het algemeen als goed beschouwd.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- N: het aantal respondenten in de steekproef.
+
+```{r interesse conventioneel - model fit, echo=FALSE, message=FALSE, warning=FALSE}
+model_fit$`Conclusion` <- c("", "", "Poor", "Good", "", "", "Good", "Poor", "Acceptabel")
+knitr::kable(model_fit)
+```
+
+###### Item Fit
+
+Hieronder bevinden zich de verschillende item fit indices. Hierbij een korte uitleg wat het exact betekent:
+
+- X2: Dit is de X2-statistiek van de item fit test. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het item niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+ 
+```{r interesse conventioneel - item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(item_fit)
+```
+
+
+Als bepaalde waarden niet goed passen in dit model, kan dit verschillende dingen betekenen.
+Ten eerste kan het zijn dat de items niet allemaal dezelfde onderliggende eigenschap meten. Ten tweede kan het zijn dat sommige items verkeerd worden begrepen door de respondenten.
+Ten derde kan het zijn dat de veronderstelling van lokale onafhankelijkheid wordt geschonden. Dit betekent dat de reacties op de items afhankelijk zijn van elkaar, zelfs na controle voor de onderliggende eigenschap. Bijvoorbeeld, als het beantwoorden van het ene item helpt bij het beantwoorden van een ander item, dan zullen deze items niet goed passen in het model.
+
+Hieronder volgt een robuste variant van de X2 test, namelijk de PV_Q1 test. Hieronder volgt een korte uitleg wat het exact betekent:
+
+De 'PV_Q1'-statistiek is een afgeleide versie van de Q1-statistiek, een chi-kwadraatstatistiek gebruikt in item respons theorie (IRT) modellen om te testen of een item goed past bij het model. 
+Een hoge 'PV_Q1'-waarde duidt op een slechte overeenkomst tussen de waargenomen gegevens en voorspellingen van het model, wat suggereert dat het item mogelijk niet conform het verwachte gedrag 
+volgens het IRT-model functioneert. Een niet-significante p-waarde, meestal p > 0.05, in combinatie met lage 'PV_Q1'- en RMSEA.PV_Q1-waarden, geeft aan dat het item goed past bij het IRT-model.
+Daarnaast is het belangrijk op te merken dat de 'PV_Q1'-statistiek robuust is tegen invloeden van steekproefomvang en lokale afhankelijkheid, waardoor het een betrouwbaar instrument is om de pasvorm
+van een item met het IRT-model te beoordelen, ongeacht de omvang van de steekproef of eventuele lokale onderlinge afhankelijkheden tussen de waarnemingen. Hieronder de resultaten:
+
+```{r interesse conventioneel - robust item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(robust_item_fit)
+```
+
+Om een beter beeld te krijgen, volgen hieronder the item parameters van de vragen. 
+In IRT, meet een factor loading (ook bekend als een discriminatieparameter) hoe goed een item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Een hoge factor loading betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+Het belangrijkste verschil met factor analyse, is dat in IRT, de factor loadings ook rekening houden met de moeilijkheidsgraad van de items. Dit betekent dat items die dezelfde moeilijkheidsgraad hebben (dat wil zeggen, ze zijn even moeilijk om te beantwoorden) worden geacht dezelfde hoeveelheid informatie te geven over de onderliggende eigenschap, ongeacht hun factor loadings. Dit is niet het geval in factoranalyse, waar de factor loadings alleen de relatie tussen de geobserveerde variabelen en de onderliggende factor meten.
+Tevens kan het zijn dat de factor loadings en de item parameters niet overeenkomen. Bijvoorbeeld een item kan een hoge factor loading hebben (wat aangeeft dat het goed discrimineert) maar toch een slechte fit hebben (X2-statistiek) als het bijvoorbeeld verkeerd wordt begrepen door de respondenten. Omgekeerd kan een item goed passen bij het model maar niet goed discrimineren tussen verschillende niveaus van de eigenschap.
+In een Graded response model, zoals hier gebruikt, zijn er meerdere moeilijkheids parameters, een voor elke vrijheidsgraaad van de vraag (totaal antwoordmogelijk - 1). 
+
+```{r interesse conventioneel - item parameters, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(params)
+```
+
+
+##### ondernemend
+
+```{r interesse ondernemend - stat extraction, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Model fit
+fit <- irt_fit$interesse_ondernemend_irt_fit
+
+model_fit <- as.data.frame(M2(fit, na.rm = TRUE))
+model_fit <- cbind(model_fit, nrow(data))
+model_fit <- rename(model_fit, `N` = `nrow(data)`)
+model_fit <- tidyr::pivot_longer(model_fit, cols = -N, names_to = "Fit Index", values_to = "Value")
+model_fit <- dplyr::select(model_fit, `Fit Index`, Value)
+model_fit$`Cut-Off` <- c("", "", "> .05", "< .05 | .05 - .1 | > .1", "", "", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90", "> .95 | .90 - .95 | < .90")
+
+# item fit
+item_fit <- itemfit(fit, na.rm = TRUE, fit_stats = "PV_Q1")
+colnames(item_fit) <- c("Item", "X2", "df", "RMSEA", "p")
+item_fit <- item_fit[order(item_fit$X2), ]
+rownames(item_fit) <- NULL
+
+robust_item_fit <- itemfit(fit, na.rm = TRUE)
+colnames(robust_item_fit) <- c("Item", "PV_Q1", "df", "RMSEA", "p")
+robust_item_fit <- robust_item_fit[order(robust_item_fit$PV_Q1), ]
+rownames(robust_item_fit) <- NULL
+
+# Item parameters
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+params <- params[, -which(colnames(params) %in% c("items.g", "items.u", "means", "F1"))]
+sink("/dev/null")
+sum <- suppressWarnings(suppressMessages(summary(fit, silent = TRUE)))
+sink()
+params <- cbind(params, sum$rotF)
+params <- cbind(params, sum$h2)
+params <- params[, c("F1", colnames(params)[-which(colnames(params) %in% "F1")])]
+colnames(params) <- c("Factor Loading", "Discrimination Parameter", "Difficulty Parameter 1", "Difficulty Parameter 2", "Difficulty Parameter 3", "Difficulty Parameter 4", "Communalities")
+params <- params[order(params$`Factor Loading`, decreasing = TRUE), ]
+
+
+# # Differential Item Functionining DIF
+# # Prepare the data
+# gender <- data$gender
+# gender <- dplyr::recode(gender, "Man" = 1, "Vrouw" = 2, "Onbekend" = 2)
+# gender <- as.factor(gender)
+# local_df <- data[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(data))]
+
+# # Fit the multiple group model
+# dif_fit <- mirt::multipleGroup(
+#   data = local_df,
+#   model = 1,
+#   group = gender
+# )
+
+# # Perform DIF analysis
+# dif <- mirt::DIF(dif_fit, group = gender, which.par = c("a1", "d"), na.rm = TRUE, plotdif = TRUE)
+
+# person fit
+# person_fit <- personfit(fit) %>%
+#   reframe(
+#     infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+#     outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+#   ) # lower row = non-fitting people
+# person_fit$Correct <- c("Correct", "Incorrect")
+# person_fit <- person_fit %>% dplyr::select(Correct, everything())
+```
+
+###### Model Fit
+
+Hieronder bevinden zich de verschillende model fit indices.Hierbij een korte uitleg wat het exact betekent:
+
+- M2: Dit is de M2-statistiek van Maydeu-Olivares, die een maat is voor de absolute fit van het model. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+  - RMSEA_5 en RMSEA_95: de 95% betrouwbaarheidsinterval van de RMSEA. Hoe kleiner dit interval rondom de RMSEA waarde, hoe zekerder we zijn van die waarde. 
+- SRMSR: SRMSR staat voor "Standardized Root Mean Square Residual". Het is een maat voor de gemiddelde discrepantie tussen de waargenomen en voorspelde covarianties. Een lagere waarde duidt op een betere fit. Een SRMSR van minder dan 0.08 wordt over het algemeen als goed beschouwd.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- N: het aantal respondenten in de steekproef.
+
+```{r interesse ondernemend - model fit, echo=FALSE, message=FALSE, warning=FALSE}
+model_fit$`Conclusion` <- c("", "", "Poor", "Acceptabel", "", "", "Good", "Poor", "Poor")
+knitr::kable(model_fit)
+```
+
+###### Item Fit
+
+Hieronder bevinden zich de verschillende item fit indices. Hierbij een korte uitleg wat het exact betekent:
+
+- X2: Dit is de X2-statistiek van de item fit test. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het item niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+ 
+```{r interesse ondernemend - item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(item_fit)
+```
+
+
+Als bepaalde waarden niet goed passen in dit model, kan dit verschillende dingen betekenen.
+Ten eerste kan het zijn dat de items niet allemaal dezelfde onderliggende eigenschap meten. Ten tweede kan het zijn dat sommige items verkeerd worden begrepen door de respondenten.
+Ten derde kan het zijn dat de veronderstelling van lokale onafhankelijkheid wordt geschonden. Dit betekent dat de reacties op de items afhankelijk zijn van elkaar, zelfs na controle voor de onderliggende eigenschap. Bijvoorbeeld, als het beantwoorden van het ene item helpt bij het beantwoorden van een ander item, dan zullen deze items niet goed passen in het model.
+
+Hieronder volgt een robuste variant van de X2 test, namelijk de PV_Q1 test. Hieronder volgt een korte uitleg wat het exact betekent:
+
+De 'PV_Q1'-statistiek is een afgeleide versie van de Q1-statistiek, een chi-kwadraatstatistiek gebruikt in item respons theorie (IRT) modellen om te testen of een item goed past bij het model. 
+Een hoge 'PV_Q1'-waarde duidt op een slechte overeenkomst tussen de waargenomen gegevens en voorspellingen van het model, wat suggereert dat het item mogelijk niet conform het verwachte gedrag 
+volgens het IRT-model functioneert. Een niet-significante p-waarde, meestal p > 0.05, in combinatie met lage 'PV_Q1'- en RMSEA.PV_Q1-waarden, geeft aan dat het item goed past bij het IRT-model.
+Daarnaast is het belangrijk op te merken dat de 'PV_Q1'-statistiek robuust is tegen invloeden van steekproefomvang en lokale afhankelijkheid, waardoor het een betrouwbaar instrument is om de pasvorm
+van een item met het IRT-model te beoordelen, ongeacht de omvang van de steekproef of eventuele lokale onderlinge afhankelijkheden tussen de waarnemingen. Hieronder de resultaten:
+
+```{r interesse ondernemend - robust item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(robust_item_fit)
+```
+
+Om een beter beeld te krijgen, volgen hieronder the item parameters van de vragen. 
+In IRT, meet een factor loading (ook bekend als een discriminatieparameter) hoe goed een item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Een hoge factor loading betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+Het belangrijkste verschil met factor analyse, is dat in IRT, de factor loadings ook rekening houden met de moeilijkheidsgraad van de items. Dit betekent dat items die dezelfde moeilijkheidsgraad hebben (dat wil zeggen, ze zijn even moeilijk om te beantwoorden) worden geacht dezelfde hoeveelheid informatie te geven over de onderliggende eigenschap, ongeacht hun factor loadings. Dit is niet het geval in factoranalyse, waar de factor loadings alleen de relatie tussen de geobserveerde variabelen en de onderliggende factor meten.
+Tevens kan het zijn dat de factor loadings en de item parameters niet overeenkomen. Bijvoorbeeld een item kan een hoge factor loading hebben (wat aangeeft dat het goed discrimineert) maar toch een slechte fit hebben (X2-statistiek) als het bijvoorbeeld verkeerd wordt begrepen door de respondenten. Omgekeerd kan een item goed passen bij het model maar niet goed discrimineren tussen verschillende niveaus van de eigenschap.
+In een Graded response model, zoals hier gebruikt, zijn er meerdere moeilijkheids parameters, een voor elke vrijheidsgraaad van de vraag (totaal antwoordmogelijk - 1). 
+
+```{r interesse ondernemend - item parameters, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(params)
+```
+
+##### intellectueel
+
+```{r interesse intellectueel - stat extraction, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Model fit
+fit <- irt_fit$interesse_intellectueel_irt_fit
+
+# model_fit <- as.data.frame(M2(fit, na.rm = TRUE))
+# model_fit <- cbind(model_fit, nrow(data))
+# model_fit <- rename(model_fit, `N` = `nrow(data)`)
+# model_fit <- tidyr::pivot_longer(model_fit, cols = -N, names_to = "Fit Index", values_to = "Value")
+# model_fit <- dplyr::select(model_fit, `Fit Index`, Value)
+# model_fit$`Cut-Off` <- c("", "", "> .05", "< .05 | .05 - .1 | > .1", "", "", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90", "> .95 | .90 - .95 | < .90")
+
+# item fit
+item_fit <- itemfit(fit, na.rm = TRUE, fit_stats = "PV_Q1")
+colnames(item_fit) <- c("Item", "X2", "df", "RMSEA", "p")
+item_fit <- item_fit[order(item_fit$X2), ]
+rownames(item_fit) <- NULL
+
+robust_item_fit <- itemfit(fit, na.rm = TRUE)
+colnames(robust_item_fit) <- c("Item", "PV_Q1", "df", "RMSEA", "p")
+robust_item_fit <- robust_item_fit[order(robust_item_fit$PV_Q1), ]
+rownames(robust_item_fit) <- NULL
+
+# Item parameters
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+params <- params[, -which(colnames(params) %in% c("items.g", "items.u", "means", "F1"))]
+sink("/dev/null")
+sum <- suppressWarnings(suppressMessages(summary(fit, silent = TRUE)))
+sink()
+params <- cbind(params, sum$rotF)
+params <- cbind(params, sum$h2)
+params <- params[, c("F1", colnames(params)[-which(colnames(params) %in% "F1")])]
+colnames(params) <- c("Factor Loading", "Discrimination Parameter", "Difficulty Parameter 1", "Difficulty Parameter 2", "Difficulty Parameter 3", "Difficulty Parameter 4", "Communalities")
+params <- params[order(params$`Factor Loading`, decreasing = TRUE), ]
+
+
+# # Differential Item Functionining DIF
+# # Prepare the data
+# gender <- data$gender
+# gender <- dplyr::recode(gender, "Man" = 1, "Vrouw" = 2, "Onbekend" = 2)
+# gender <- as.factor(gender)
+# local_df <- data[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(data))]
+
+# # Fit the multiple group model
+# dif_fit <- mirt::multipleGroup(
+#   data = local_df,
+#   model = 1,
+#   group = gender
+# )
+
+# # Perform DIF analysis
+# dif <- mirt::DIF(dif_fit, group = gender, which.par = c("a1", "d"), na.rm = TRUE, plotdif = TRUE)
+
+# person fit
+# person_fit <- personfit(fit) %>%
+#   reframe(
+#     infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+#     outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+#   ) # lower row = non-fitting people
+# person_fit$Correct <- c("Correct", "Incorrect")
+# person_fit <- person_fit %>% dplyr::select(Correct, everything())
+```
+
+###### Model Fit
+
+Hieronder bevinden zich de verschillende model fit indices.Hierbij een korte uitleg wat het exact betekent:
+
+- M2: Dit is de M2-statistiek van Maydeu-Olivares, die een maat is voor de absolute fit van het model. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+  - RMSEA_5 en RMSEA_95: de 95% betrouwbaarheidsinterval van de RMSEA. Hoe kleiner dit interval rondom de RMSEA waarde, hoe zekerder we zijn van die waarde. 
+- SRMSR: SRMSR staat voor "Standardized Root Mean Square Residual". Het is een maat voor de gemiddelde discrepantie tussen de waargenomen en voorspelde covarianties. Een lagere waarde duidt op een betere fit. Een SRMSR van minder dan 0.08 wordt over het algemeen als goed beschouwd.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- N: het aantal respondenten in de steekproef.
+
+```{r interesse intellectueel - model fit, echo=FALSE, message=FALSE, warning=FALSE}
+# model_fit$`Conclusion` <- c("", "", "Poor", "Good", "", "", "Good", "Poor", "Acceptabel")
+# knitr::kable(model_fit)
+```
+
+###### Item Fit
+
+Hieronder bevinden zich de verschillende item fit indices. Hierbij een korte uitleg wat het exact betekent:
+
+- X2: Dit is de X2-statistiek van de item fit test. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het item niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+ 
+```{r interesse intellectueel - item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(item_fit)
+```
+
+
+Als bepaalde waarden niet goed passen in dit model, kan dit verschillende dingen betekenen.
+Ten eerste kan het zijn dat de items niet allemaal dezelfde onderliggende eigenschap meten. Ten tweede kan het zijn dat sommige items verkeerd worden begrepen door de respondenten.
+Ten derde kan het zijn dat de veronderstelling van lokale onafhankelijkheid wordt geschonden. Dit betekent dat de reacties op de items afhankelijk zijn van elkaar, zelfs na controle voor de onderliggende eigenschap. Bijvoorbeeld, als het beantwoorden van het ene item helpt bij het beantwoorden van een ander item, dan zullen deze items niet goed passen in het model.
+
+Hieronder volgt een robuste variant van de X2 test, namelijk de PV_Q1 test. Hieronder volgt een korte uitleg wat het exact betekent:
+
+De 'PV_Q1'-statistiek is een afgeleide versie van de Q1-statistiek, een chi-kwadraatstatistiek gebruikt in item respons theorie (IRT) modellen om te testen of een item goed past bij het model. 
+Een hoge 'PV_Q1'-waarde duidt op een slechte overeenkomst tussen de waargenomen gegevens en voorspellingen van het model, wat suggereert dat het item mogelijk niet conform het verwachte gedrag 
+volgens het IRT-model functioneert. Een niet-significante p-waarde, meestal p > 0.05, in combinatie met lage 'PV_Q1'- en RMSEA.PV_Q1-waarden, geeft aan dat het item goed past bij het IRT-model.
+Daarnaast is het belangrijk op te merken dat de 'PV_Q1'-statistiek robuust is tegen invloeden van steekproefomvang en lokale afhankelijkheid, waardoor het een betrouwbaar instrument is om de pasvorm
+van een item met het IRT-model te beoordelen, ongeacht de omvang van de steekproef of eventuele lokale onderlinge afhankelijkheden tussen de waarnemingen. Hieronder de resultaten:
+
+```{r interesse intellectueel - robust item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(robust_item_fit)
+```
+
+Om een beter beeld te krijgen, volgen hieronder the item parameters van de vragen. 
+In IRT, meet een factor loading (ook bekend als een discriminatieparameter) hoe goed een item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Een hoge factor loading betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+Het belangrijkste verschil met factor analyse, is dat in IRT, de factor loadings ook rekening houden met de moeilijkheidsgraad van de items. Dit betekent dat items die dezelfde moeilijkheidsgraad hebben (dat wil zeggen, ze zijn even moeilijk om te beantwoorden) worden geacht dezelfde hoeveelheid informatie te geven over de onderliggende eigenschap, ongeacht hun factor loadings. Dit is niet het geval in factoranalyse, waar de factor loadings alleen de relatie tussen de geobserveerde variabelen en de onderliggende factor meten.
+Tevens kan het zijn dat de factor loadings en de item parameters niet overeenkomen. Bijvoorbeeld een item kan een hoge factor loading hebben (wat aangeeft dat het goed discrimineert) maar toch een slechte fit hebben (X2-statistiek) als het bijvoorbeeld verkeerd wordt begrepen door de respondenten. Omgekeerd kan een item goed passen bij het model maar niet goed discrimineren tussen verschillende niveaus van de eigenschap.
+In een Graded response model, zoals hier gebruikt, zijn er meerdere moeilijkheids parameters, een voor elke vrijheidsgraaad van de vraag (totaal antwoordmogelijk - 1). 
+
+```{r interesse intellectueel - item parameters, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(params)
+```
+
+
+##### artistiek
+
+```{r interesse artistiek - stat extraction, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Model fit
+fit <- irt_fit$interesse_artistiek_irt_fit
+
+# model_fit <- as.data.frame(M2(fit, na.rm = TRUE))
+# model_fit <- cbind(model_fit, nrow(data))
+# model_fit <- rename(model_fit, `N` = `nrow(data)`)
+# model_fit <- tidyr::pivot_longer(model_fit, cols = -N, names_to = "Fit Index", values_to = "Value")
+# model_fit <- dplyr::select(model_fit, `Fit Index`, Value)
+# model_fit$`Cut-Off` <- c("", "", "> .05", "< .05 | .05 - .1 | > .1", "", "", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90", "> .95 | .90 - .95 | < .90")
+
+# item fit
+item_fit <- itemfit(fit, na.rm = TRUE, fit_stats = "PV_Q1")
+colnames(item_fit) <- c("Item", "X2", "df", "RMSEA", "p")
+item_fit <- item_fit[order(item_fit$X2), ]
+rownames(item_fit) <- NULL
+
+robust_item_fit <- itemfit(fit, na.rm = TRUE)
+colnames(robust_item_fit) <- c("Item", "PV_Q1", "df", "RMSEA", "p")
+robust_item_fit <- robust_item_fit[order(robust_item_fit$PV_Q1), ]
+rownames(robust_item_fit) <- NULL
+
+# Item parameters
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+params <- params[, -which(colnames(params) %in% c("items.g", "items.u", "means", "F1"))]
+sink("/dev/null")
+sum <- suppressWarnings(suppressMessages(summary(fit, silent = TRUE)))
+sink()
+params <- cbind(params, sum$rotF)
+params <- cbind(params, sum$h2)
+params <- params[, c("F1", colnames(params)[-which(colnames(params) %in% "F1")])]
+colnames(params) <- c("Factor Loading", "Discrimination Parameter", "Difficulty Parameter 1", "Difficulty Parameter 2", "Difficulty Parameter 3", "Difficulty Parameter 4", "Communalities")
+params <- params[order(params$`Factor Loading`, decreasing = TRUE), ]
+
+
+# # Differential Item Functionining DIF
+# # Prepare the data
+# gender <- data$gender
+# gender <- dplyr::recode(gender, "Man" = 1, "Vrouw" = 2, "Onbekend" = 2)
+# gender <- as.factor(gender)
+# local_df <- data[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(data))]
+
+# # Fit the multiple group model
+# dif_fit <- mirt::multipleGroup(
+#   data = local_df,
+#   model = 1,
+#   group = gender
+# )
+
+# # Perform DIF analysis
+# dif <- mirt::DIF(dif_fit, group = gender, which.par = c("a1", "d"), na.rm = TRUE, plotdif = TRUE)
+
+# person fit
+# person_fit <- personfit(fit) %>%
+#   reframe(
+#     infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+#     outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+#   ) # lower row = non-fitting people
+# person_fit$Correct <- c("Correct", "Incorrect")
+# person_fit <- person_fit %>% dplyr::select(Correct, everything())
+```
+
+###### Model Fit
+
+Hieronder bevinden zich de verschillende model fit indices.Hierbij een korte uitleg wat het exact betekent:
+
+- M2: Dit is de M2-statistiek van Maydeu-Olivares, die een maat is voor de absolute fit van het model. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+  - RMSEA_5 en RMSEA_95: de 95% betrouwbaarheidsinterval van de RMSEA. Hoe kleiner dit interval rondom de RMSEA waarde, hoe zekerder we zijn van die waarde. 
+- SRMSR: SRMSR staat voor "Standardized Root Mean Square Residual". Het is een maat voor de gemiddelde discrepantie tussen de waargenomen en voorspelde covarianties. Een lagere waarde duidt op een betere fit. Een SRMSR van minder dan 0.08 wordt over het algemeen als goed beschouwd.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- N: het aantal respondenten in de steekproef.
+
+```{r interesse artistiek - model fit, echo=FALSE, message=FALSE, warning=FALSE}
+# model_fit$`Conclusion` <- c("", "", "Poor", "Good", "", "", "Good", "Poor", "Acceptabel")
+# knitr::kable(model_fit)
+```
+
+###### Item Fit
+
+Hieronder bevinden zich de verschillende item fit indices. Hierbij een korte uitleg wat het exact betekent:
+
+- X2: Dit is de X2-statistiek van de item fit test. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het item niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+ 
+```{r interesse artistiek - item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(item_fit)
+```
+
+
+Als bepaalde waarden niet goed passen in dit model, kan dit verschillende dingen betekenen.
+Ten eerste kan het zijn dat de items niet allemaal dezelfde onderliggende eigenschap meten. Ten tweede kan het zijn dat sommige items verkeerd worden begrepen door de respondenten.
+Ten derde kan het zijn dat de veronderstelling van lokale onafhankelijkheid wordt geschonden. Dit betekent dat de reacties op de items afhankelijk zijn van elkaar, zelfs na controle voor de onderliggende eigenschap. Bijvoorbeeld, als het beantwoorden van het ene item helpt bij het beantwoorden van een ander item, dan zullen deze items niet goed passen in het model.
+
+Hieronder volgt een robuste variant van de X2 test, namelijk de PV_Q1 test. Hieronder volgt een korte uitleg wat het exact betekent:
+
+De 'PV_Q1'-statistiek is een afgeleide versie van de Q1-statistiek, een chi-kwadraatstatistiek gebruikt in item respons theorie (IRT) modellen om te testen of een item goed past bij het model. 
+Een hoge 'PV_Q1'-waarde duidt op een slechte overeenkomst tussen de waargenomen gegevens en voorspellingen van het model, wat suggereert dat het item mogelijk niet conform het verwachte gedrag 
+volgens het IRT-model functioneert. Een niet-significante p-waarde, meestal p > 0.05, in combinatie met lage 'PV_Q1'- en RMSEA.PV_Q1-waarden, geeft aan dat het item goed past bij het IRT-model.
+Daarnaast is het belangrijk op te merken dat de 'PV_Q1'-statistiek robuust is tegen invloeden van steekproefomvang en lokale afhankelijkheid, waardoor het een betrouwbaar instrument is om de pasvorm
+van een item met het IRT-model te beoordelen, ongeacht de omvang van de steekproef of eventuele lokale onderlinge afhankelijkheden tussen de waarnemingen. Hieronder de resultaten:
+
+```{r interesse artistiek - robust item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(robust_item_fit)
+```
+
+Om een beter beeld te krijgen, volgen hieronder the item parameters van de vragen. 
+In IRT, meet een factor loading (ook bekend als een discriminatieparameter) hoe goed een item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Een hoge factor loading betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+Het belangrijkste verschil met factor analyse, is dat in IRT, de factor loadings ook rekening houden met de moeilijkheidsgraad van de items. Dit betekent dat items die dezelfde moeilijkheidsgraad hebben (dat wil zeggen, ze zijn even moeilijk om te beantwoorden) worden geacht dezelfde hoeveelheid informatie te geven over de onderliggende eigenschap, ongeacht hun factor loadings. Dit is niet het geval in factoranalyse, waar de factor loadings alleen de relatie tussen de geobserveerde variabelen en de onderliggende factor meten.
+Tevens kan het zijn dat de factor loadings en de item parameters niet overeenkomen. Bijvoorbeeld een item kan een hoge factor loading hebben (wat aangeeft dat het goed discrimineert) maar toch een slechte fit hebben (X2-statistiek) als het bijvoorbeeld verkeerd wordt begrepen door de respondenten. Omgekeerd kan een item goed passen bij het model maar niet goed discrimineren tussen verschillende niveaus van de eigenschap.
+In een Graded response model, zoals hier gebruikt, zijn er meerdere moeilijkheids parameters, een voor elke vrijheidsgraaad van de vraag (totaal antwoordmogelijk - 1). 
+
+```{r interesse artistiek - item parameters, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(params)
+```
+
+
+
+##### sociaal
+
+```{r interesse sociaal - stat extraction, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Model fit
+fit <- irt_fit$interesse_sociaal_irt_fit
+
+# model_fit <- as.data.frame(M2(fit, na.rm = TRUE))
+# model_fit <- cbind(model_fit, nrow(data))
+# model_fit <- rename(model_fit, `N` = `nrow(data)`)
+# model_fit <- tidyr::pivot_longer(model_fit, cols = -N, names_to = "Fit Index", values_to = "Value")
+# model_fit <- dplyr::select(model_fit, `Fit Index`, Value)
+# model_fit$`Cut-Off` <- c("", "", "> .05", "< .05 | .05 - .1 | > .1", "", "", "< .08 | .08 - .10 | > .10", "> .95 | .90 - .95 | < .90", "> .95 | .90 - .95 | < .90")
+
+# item fit
+# item_fit <- itemfit(fit, na.rm = TRUE, fit_stats = "PV_Q1")
+# colnames(item_fit) <- c("Item", "X2", "df", "RMSEA", "p")
+# item_fit <- item_fit[order(item_fit$X2), ]
+# rownames(item_fit) <- NULL
+
+robust_item_fit <- itemfit(fit, na.rm = TRUE)
+colnames(robust_item_fit) <- c("Item", "PV_Q1", "df", "RMSEA", "p")
+robust_item_fit <- robust_item_fit[order(robust_item_fit$PV_Q1), ]
+rownames(robust_item_fit) <- NULL
+
+# Item parameters
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+params <- params[, -which(colnames(params) %in% c("items.g", "items.u", "means", "F1"))]
+sink("/dev/null")
+sum <- suppressWarnings(suppressMessages(summary(fit, silent = TRUE)))
+sink()
+params <- cbind(params, sum$rotF)
+params <- cbind(params, sum$h2)
+params <- params[, c("F1", colnames(params)[-which(colnames(params) %in% "F1")])]
+colnames(params) <- c("Factor Loading", "Discrimination Parameter", "Difficulty Parameter 1", "Difficulty Parameter 2", "Difficulty Parameter 3", "Difficulty Parameter 4", "Communalities")
+params <- params[order(params$`Factor Loading`, decreasing = TRUE), ]
+
+
+# # Differential Item Functionining DIF
+# # Prepare the data
+# gender <- data$gender
+# gender <- dplyr::recode(gender, "Man" = 1, "Vrouw" = 2, "Onbekend" = 2)
+# gender <- as.factor(gender)
+# local_df <- data[, !grepl("package_duration_raw|student_number|student_name|birth_date|gender", colnames(data))]
+
+# # Fit the multiple group model
+# dif_fit <- mirt::multipleGroup(
+#   data = local_df,
+#   model = 1,
+#   group = gender
+# )
+
+# # Perform DIF analysis
+# dif <- mirt::DIF(dif_fit, group = gender, which.par = c("a1", "d"), na.rm = TRUE, plotdif = TRUE)
+
+# person fit
+# person_fit <- personfit(fit) %>%
+#   reframe(
+#     infit.outside = prop.table(table(z.infit > 1.96 | z.infit < -1.96)),
+#     outfit.outside = prop.table(table(z.outfit > 1.96 | z.outfit < -1.96))
+#   ) # lower row = non-fitting people
+# person_fit$Correct <- c("Correct", "Incorrect")
+# person_fit <- person_fit %>% dplyr::select(Correct, everything())
+```
+
+###### Model Fit
+
+Hieronder bevinden zich de verschillende model fit indices.Hierbij een korte uitleg wat het exact betekent:
+
+- M2: Dit is de M2-statistiek van Maydeu-Olivares, die een maat is voor de absolute fit van het model. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+  - RMSEA_5 en RMSEA_95: de 95% betrouwbaarheidsinterval van de RMSEA. Hoe kleiner dit interval rondom de RMSEA waarde, hoe zekerder we zijn van die waarde. 
+- SRMSR: SRMSR staat voor "Standardized Root Mean Square Residual". Het is een maat voor de gemiddelde discrepantie tussen de waargenomen en voorspelde covarianties. Een lagere waarde duidt op een betere fit. Een SRMSR van minder dan 0.08 wordt over het algemeen als goed beschouwd.
+- TLI: de Tucker-Lewis Index. TLI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- CFI: de Comparative Fit Index. De CFI is een pasvormindex gebruikt in structurele vergelijkingsmodellen om de relatieve verbetering van het gespecificeerde model te beoordelen in vergelijking met een basismodel. Waarden dicht bij 1 geven een betere pasvorm aan, met een gemeenschappelijke grenswaarde voor acceptabele pasvorm van 0.90 of hoger.
+- N: het aantal respondenten in de steekproef.
+
+```{r interesse sociaal - model fit, echo=FALSE, message=FALSE, warning=FALSE}
+# model_fit$`Conclusion` <- c("", "", "Poor", "Good", "", "", "Good", "Poor", "Acceptabel")
+# knitr::kable(model_fit)
+```
+
+###### Item Fit
+
+Hieronder bevinden zich de verschillende item fit indices. Hierbij een korte uitleg wat het exact betekent:
+
+- X2: Dit is de X2-statistiek van de item fit test. Een lager getal duidt op een betere fit. Er is geen vaste cut-off waarde, maar over het algemeen wordt een lagere waarde als beter beschouwd. Als de bijbehorende p-waarde kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het item niet goed past.
+- df: de degrees of freedom van het model. Dit is het aantal parameters dat is geschat, minus het aantal constraints dat is opgelegd.
+- p-value: de p-waarde van de Goodness of fit test. Als deze kleiner is dan .05, dan is er een significant verschil tussen de empirische en de geschatte chi-square. Dit betekent dat het model niet goed past.
+- RMSEA: RMSEA meet hoe goed een model de waargenomen data benadert, rekening houdend met de fout in het model. Lagere waarden duiden op een betere pasvorm, typisch onder 0.05 voor goede pasvorm en tussen 0.05 en 0.08 voor redelijke pasvorm.
+ 
+```{r interesse sociaal - item fit, echo=FALSE, message=FALSE, warning=FALSE}
+# knitr::kable(item_fit)
+```
+
+
+Als bepaalde waarden niet goed passen in dit model, kan dit verschillende dingen betekenen.
+Ten eerste kan het zijn dat de items niet allemaal dezelfde onderliggende eigenschap meten. Ten tweede kan het zijn dat sommige items verkeerd worden begrepen door de respondenten.
+Ten derde kan het zijn dat de veronderstelling van lokale onafhankelijkheid wordt geschonden. Dit betekent dat de reacties op de items afhankelijk zijn van elkaar, zelfs na controle voor de onderliggende eigenschap. Bijvoorbeeld, als het beantwoorden van het ene item helpt bij het beantwoorden van een ander item, dan zullen deze items niet goed passen in het model.
+
+Hieronder volgt een robuste variant van de X2 test, namelijk de PV_Q1 test. Hieronder volgt een korte uitleg wat het exact betekent:
+
+De 'PV_Q1'-statistiek is een afgeleide versie van de Q1-statistiek, een chi-kwadraatstatistiek gebruikt in item respons theorie (IRT) modellen om te testen of een item goed past bij het model. 
+Een hoge 'PV_Q1'-waarde duidt op een slechte overeenkomst tussen de waargenomen gegevens en voorspellingen van het model, wat suggereert dat het item mogelijk niet conform het verwachte gedrag 
+volgens het IRT-model functioneert. Een niet-significante p-waarde, meestal p > 0.05, in combinatie met lage 'PV_Q1'- en RMSEA.PV_Q1-waarden, geeft aan dat het item goed past bij het IRT-model.
+Daarnaast is het belangrijk op te merken dat de 'PV_Q1'-statistiek robuust is tegen invloeden van steekproefomvang en lokale afhankelijkheid, waardoor het een betrouwbaar instrument is om de pasvorm
+van een item met het IRT-model te beoordelen, ongeacht de omvang van de steekproef of eventuele lokale onderlinge afhankelijkheden tussen de waarnemingen. Hieronder de resultaten:
+
+```{r interesse sociaal - robust item fit, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(robust_item_fit)
+```
+
+Om een beter beeld te krijgen, volgen hieronder the item parameters van de vragen. 
+In IRT, meet een factor loading (ook bekend als een discriminatieparameter) hoe goed een item onderscheid maakt tussen personen met verschillende niveaus van de onderliggende eigenschap. Een hoge factor loading betekent dat het item gevoelig is voor verschillen in de onderliggende eigenschap.
+Het belangrijkste verschil met factor analyse, is dat in IRT, de factor loadings ook rekening houden met de moeilijkheidsgraad van de items. Dit betekent dat items die dezelfde moeilijkheidsgraad hebben (dat wil zeggen, ze zijn even moeilijk om te beantwoorden) worden geacht dezelfde hoeveelheid informatie te geven over de onderliggende eigenschap, ongeacht hun factor loadings. Dit is niet het geval in factoranalyse, waar de factor loadings alleen de relatie tussen de geobserveerde variabelen en de onderliggende factor meten.
+Tevens kan het zijn dat de factor loadings en de item parameters niet overeenkomen. Bijvoorbeeld een item kan een hoge factor loading hebben (wat aangeeft dat het goed discrimineert) maar toch een slechte fit hebben (X2-statistiek) als het bijvoorbeeld verkeerd wordt begrepen door de respondenten. Omgekeerd kan een item goed passen bij het model maar niet goed discrimineren tussen verschillende niveaus van de eigenschap.
+In een Graded response model, zoals hier gebruikt, zijn er meerdere moeilijkheids parameters, een voor elke vrijheidsgraaad van de vraag (totaal antwoordmogelijk - 1). 
+
+```{r interesse sociaal - item parameters, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::kable(params)
+```
 
 ## grafieken
 
@@ -5207,3 +6067,215 @@ knitr::kable(df)
 
 ![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/gedrag_houding_ouder_zorgvuldig_irt_fit_TIC.png)
 
+
+### Interesse
+
+#### Realistisch
+
+```{r interesse realistisch - number to names, echo=FALSE, message=FALSE, warning=FALSE}
+irt_fit <- readRDS(paste0(here(), "/data/item_analyses_pers2024/irt_fit_interesse.rds"))
+
+
+# Model fit
+fit <- irt_fit$interesse_realistisch_irt_fit
+
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+item_names <- extract.mirt(fit, what = "itemnames")
+
+df <- data.frame(
+  item_number = paste0("Item ", seq_along(item_names)),
+  item_names = item_names,
+  item_discrimination = params$items.a,
+  item_difficulty1 = params$items.b1,
+  item_difficulty2 = params$items.b2,
+  item_difficulty3 = params$items.b3,
+  item_difficulty4 = params$items.b4
+)
+knitr::kable(df)
+```
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_realistisch_irt_fit_ICC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_realistisch_irt_fit_IIC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_realistisch_irt_fit_IIC_separate.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_realistisch_irt_fit_TCC.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_realistisch_irt_fit_TIC.png)
+
+
+
+#### Conventioneel
+
+```{r interesse conventioneel - number to names, echo=FALSE, message=FALSE, warning=FALSE}
+irt_fit <- readRDS(paste0(here(), "/data/item_analyses_pers2024/irt_fit_interesse.rds"))
+
+
+# Model fit
+fit <- irt_fit$interesse_conventioneel_irt_fit
+
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+item_names <- extract.mirt(fit, what = "itemnames")
+
+df <- data.frame(
+  item_number = paste0("Item ", seq_along(item_names)),
+  item_names = item_names,
+  item_discrimination = params$items.a,
+  item_difficulty1 = params$items.b1,
+  item_difficulty2 = params$items.b2,
+  item_difficulty3 = params$items.b3,
+  item_difficulty4 = params$items.b4
+)
+knitr::kable(df)
+```
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_conventioneel_irt_fit_ICC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_conventioneel_irt_fit_IIC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_conventioneel_irt_fit_IIC_separate.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_conventioneel_irt_fit_TCC.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_conventioneel_irt_fit_TIC.png)
+
+
+#### Ondernemend
+
+```{r interesse ondernemend - number to names, echo=FALSE, message=FALSE, warning=FALSE}
+irt_fit <- readRDS(paste0(here(), "/data/item_analyses_pers2024/irt_fit_interesse.rds"))
+
+
+# Model fit
+fit <- irt_fit$interesse_ondernemend_irt_fit
+
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+item_names <- extract.mirt(fit, what = "itemnames")
+
+df <- data.frame(
+  item_number = paste0("Item ", seq_along(item_names)),
+  item_names = item_names,
+  item_discrimination = params$items.a,
+  item_difficulty1 = params$items.b1,
+  item_difficulty2 = params$items.b2,
+  item_difficulty3 = params$items.b3,
+  item_difficulty4 = params$items.b4
+)
+knitr::kable(df)
+```
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_ondernemend_irt_fit_ICC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_ondernemend_irt_fit_IIC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_ondernemend_irt_fit_IIC_separate.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_ondernemend_irt_fit_TCC.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_ondernemend_irt_fit_TIC.png)
+
+
+#### Intellectueel
+
+```{r interesse intellectueel - number to names, echo=FALSE, message=FALSE, warning=FALSE}
+irt_fit <- readRDS(paste0(here(), "/data/item_analyses_pers2024/irt_fit_interesse.rds"))
+
+
+# Model fit
+fit <- irt_fit$interesse_intellectueel_irt_fit
+
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+item_names <- extract.mirt(fit, what = "itemnames")
+
+df <- data.frame(
+  item_number = paste0("Item ", seq_along(item_names)),
+  item_names = item_names,
+  item_discrimination = params$items.a,
+  item_difficulty1 = params$items.b1,
+  item_difficulty2 = params$items.b2,
+  item_difficulty3 = params$items.b3,
+  item_difficulty4 = params$items.b4
+)
+knitr::kable(df)
+```
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_intellectueel_irt_fit_ICC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_intellectueel_irt_fit_IIC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_intellectueel_irt_fit_IIC_separate.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_intellectueel_irt_fit_TCC.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_intellectueel_irt_fit_TIC.png)
+
+
+#### artistiek
+
+```{r interesse artistiek - number to names, echo=FALSE, message=FALSE, warning=FALSE}
+irt_fit <- readRDS(paste0(here(), "/data/item_analyses_pers2024/irt_fit_interesse.rds"))
+
+
+# Model fit
+fit <- irt_fit$interesse_artistiek_irt_fit
+
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+item_names <- extract.mirt(fit, what = "itemnames")
+
+df <- data.frame(
+  item_number = paste0("Item ", seq_along(item_names)),
+  item_names = item_names,
+  item_discrimination = params$items.a,
+  item_difficulty1 = params$items.b1,
+  item_difficulty2 = params$items.b2,
+  item_difficulty3 = params$items.b3,
+  item_difficulty4 = params$items.b4
+)
+knitr::kable(df)
+```
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_artistiek_irt_fit_ICC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_artistiek_irt_fit_IIC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_artistiek_irt_fit_IIC_separate.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_artistiek_irt_fit_TCC.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_artistiek_irt_fit_TIC.png)
+
+
+#### Sociaal
+
+```{r interesse sociaal - number to names, echo=FALSE, message=FALSE, warning=FALSE}
+irt_fit <- readRDS(paste0(here(), "/data/item_analyses_pers2024/irt_fit_interesse.rds"))
+
+
+# Model fit
+fit <- irt_fit$interesse_sociaal_irt_fit
+
+params <- as.data.frame(coef(fit, IRTpars = TRUE, simplify = TRUE))
+item_names <- extract.mirt(fit, what = "itemnames")
+
+df <- data.frame(
+  item_number = paste0("Item ", seq_along(item_names)),
+  item_names = item_names,
+  item_discrimination = params$items.a,
+  item_difficulty1 = params$items.b1,
+  item_difficulty2 = params$items.b2,
+  item_difficulty3 = params$items.b3,
+  item_difficulty4 = params$items.b4
+)
+knitr::kable(df)
+```
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_sociaal_irt_fit_ICC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_sociaal_irt_fit_IIC_combined.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_sociaal_irt_fit_IIC_separate.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_sociaal_irt_fit_TCC.png)
+
+![](/Users/jesse/Repos/r-jvb-aansluiting/data/item_analyses_pers`r format(Sys.Date(), "%Y")`/graphs/interesse_sociaal_irt_fit_TIC.png)

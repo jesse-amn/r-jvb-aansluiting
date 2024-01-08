@@ -75,7 +75,7 @@ load_data <- function(path, output = NULL) {
     name <- gsub("_feb2018.txt", "", name)
     print(name)
 
-    data <- read.csv(df, header = TRUE, sep = "\t")
+    data <- read.delim(df, header = TRUE, sep = "\t")
 
     assign(name, data, envir = .GlobalEnv)
     rm(name, data)
