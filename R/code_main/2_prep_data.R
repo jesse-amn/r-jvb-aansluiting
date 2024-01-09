@@ -23,11 +23,10 @@ Table of Contents:
   9. File Report:         Notations, comments, and references
 
 "
+
+# Parameters ####
 item_analyses <- TRUE
 
-
-
-# TODO: Meetenmeetkunde
 
 # Environment Set-up ####
 ##  General ####
@@ -67,143 +66,119 @@ rm(df)
 meta_df <- read.csv("./data/data_input/meta_file.csv")
 
 # Data Preparation ####
-## Main data ####
+## Duraiton data ####
 for (name in basename(file_list) %>% gsub(".csv", "", .)) {
-  print(name)
-  # get df localy
-  df <- get(name)
+  ## get df localy ####
+  local_df <- get(name)
 
-  # filter df
-  df <- df[, grepl("student_name|birth_date|student_number|gender|package_origin|package_duration_raw|item.SCORE", colnames(df))]
-  df <- df[, !grepl("intro_prac|intro_info|_wrong", colnames(df))]
+  ## filter local_df ####
+  local_df <- local_df[, grepl("student_name|duration", colnames(local_df))]
 
-  # Remove completely empty columns
-  df <- df[, colSums(!is.na(df)) > 0]
+  ## Change comma to dot ####
+  local_df[, !grepl("student_name|package_duration", colnames(local_df))] <- lapply(local_df[, !grepl("student_name|package_duration", colnames(local_df))], function(x) gsub(",", ".", x))
 
-  # Remove completely empty rows
-  df <- df[rowSums(is.na(df)) != ncol(df), ]
+  ## Change to numeric ####
+  local_df[, !grepl("student_name|package_duration", colnames(local_df))] <- lapply(local_df[, !grepl("student_name|package_duration", colnames(local_df))], function(x) as.numeric(x))
 
-  # Remove ".SCORE" from column names
-  colnames(df) <- gsub("_item.SCORE|_item.SCORES", "", colnames(df))
-
-  # Remove questions ending on MM (only applicable for metenenmeetkunde)
-  df <- df[, !grepl("MM$|MM_NEW$", colnames(df))]
-
-  assign(name, df, envir = .GlobalEnv)
+  ## create subdirectory if it does not exist yet ####
+  if (!dir.exists("./data/data_interrim/duration")) {
+    dir.create("./data/data_interrim/duration")
+  }
+  ## Save df's ####
+  write_csv(local_df, paste0("./data/data_interrim/duration/", name, "_duration.csv"))
 }
-rm(name, df)
 
+## Main data ####
+### Loop over dataframes and clean them up ####
+for (name in basename(file_list) %>% gsub(".csv", "", .)) {
+  #### get local_df localy ####
+  local_df <- get(name)
 
-# Get cap_files
+  #### filter local_df ####
+  local_df <- local_df[, grepl("student_name|birth_date|student_number|gender|package_origin|package_duration_raw|item.SCORE", colnames(local_df))]
+  local_df <- local_df[, !grepl("intro_prac|intro_info|_wrong", colnames(local_df))]
+
+  #### Remove completely empty columns ####
+  local_df <- local_df[, colSums(!is.na(local_df)) > 0]
+
+  #### Remove completely empty rows ####
+  local_df <- local_df[rowSums(is.na(local_df)) != ncol(local_df), ]
+
+  #### Remove ".SCORE" from selected column names ####
+  colnames(local_df) <- gsub("_item.SCORE|_item.SCORES", "", colnames(local_df))
+
+  #### Remove questions ending on MM (only applicable for metenenmeetkunde) ####
+  local_df <- local_df[, !grepl("MM$|MM_NEW$", colnames(local_df))]
+
+  #### Assign back to global environment ####
+  assign(name, local_df, envir = .GlobalEnv)
+}
+#### Remove name and local_df from local environment ####
+rm(name, local_df)
+
+## Capacity, replace NA's with 0's ####
 cap_files <- basename(file_list) %>% gsub(".csv", "", .)
 cap_files <- cap_files[!grepl("gedrag_houding|interesse", cap_files)]
 
-# itereate and replace NA's with 0's
+### itereate and replace NA's with 0's ####
 for (name in cap_files) {
-  df <- get(name)
+  local_df <- get(name)
 
-  # Replace NA's with 0's in most columns
+  #### selected columns ####
   cols_to_exclude <- c("gender", "student_number", "student_name", "birth_date")
-  if (any(grepl("package_duration_raw", colnames(df)))) {
+  if (any(grepl("package_duration_raw", colnames(local_df)))) {
     cols_to_exclude <- c(cols_to_exclude, "package_duration_raw")
   }
 
-  df <- df %>%
+  #### Replace NA's with 0's in selected columns #####
+  local_df <- local_df %>%
     mutate_at(vars(-one_of(cols_to_exclude)), ~ ifelse(is.na(.), 0, .))
-  # Assign back to global environment
-  assign(name, df, envir = .GlobalEnv)
 
-  print(sum(is.na(df)))
+  #### Assign back to global environment ####
+  assign(name, local_df, envir = .GlobalEnv)
 }
 
-
-# Remove rows of impossible values in metenenmeetkunde
+### Remove rows of impossible values in metenenmeetkunde ####
 metenenmeetkunde <- metenenmeetkunde[apply(metenenmeetkunde[, grepl("^ASL", colnames(metenenmeetkunde))], 1, function(x) all(x %in% c(0, 1))), ]
-
-
-'
-colnames(metenenmeetkunde)
-summary(metenenmeetkunde)
-head(metenenmeetkunde)
-# Count occurrences of 0s and 1s for specific variables in metenenmeetkunde
-test <- metenenmeetkunde
-df <- metenenmeetkunde[, grepl("0F_007", colnames(metenenmeetkunde))]
-
-count_table <- data.frame(variable = character(), zeros = integer(), ones = integer(), stringsAsFactors = FALSE)
-for (variable in colnames(df)) {
-  count <- table(df[[variable]])
-  zeros <- count[["0"]]
-  ones <- count[["1"]]
-  count_table <- rbind(count_table, data.frame(variable = variable, zeros = zeros, ones = ones))
-}
-
-
-
-'
-
-
-if (item_analyses == TRUE) {
-  save_all_dfs("./data/data_interrim")
-  rm(list = ls())
-
-  sink("/dev/null")
-  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/factor_analyses.R"), echo = FALSE)))
-  sink()
-
-  sink("/dev/null")
-  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/factor_analyses_simple.R"), echo = FALSE)))
-  sink()
-
-  sink("/dev/null")
-  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/IRT.R"), echo = FALSE)))
-  sink()
-
-  sink("/dev/null")
-  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/item_analyses_personality.R"), echo = FALSE)))
-  sink()
-}
-
-
-
-
-
-
-
-missing_rows <- data.frame()
-percentage_threshold <- 0.2 # Change this value to your desired percentage threshold
-
-for (name in basename(file_list) %>% gsub(".csv", "", .)) {
-  df <- get(name)
-  missing_count <- sum(rowSums(is.na(df)) > ncol(df) * percentage_threshold)
-  total_rows <- nrow(df)
-  percentage_missing <- missing_count / total_rows * 100
-  missing_rows <- rbind(missing_rows, data.frame(Dataframe = name, MissingRows = missing_count, PercentageMissing = percentage_missing))
-}
-missing_rows
-
-missing_columns <- data.frame()
-percentage_threshold <- 0.7 # Change this value to your desired percentage threshold
-
-for (name in basename(file_list) %>% gsub(".csv", "", .)) {
-  df <- get(name)
-  missing_count <- sum(colSums(is.na(df)) > nrow(df) * percentage_threshold)
-  total_columns <- ncol(df)
-  percentage_missing <- missing_count / total_columns * 100
-  missing_columns <- rbind(missing_columns, data.frame(Dataframe = name, MissingColumns = missing_count, PercentageMissing = percentage_missing, ColumnNames = paste(colnames(df)[colSums(is.na(df)) > nrow(df) * percentage_threshold], collapse = ", ")))
-}
-missing_columns
-
 
 ## Metadata ####
 meta_df <- meta_df[, c(
   "ID", "PackageFriendlyName", "Factor", "CorrectAnswer"
 )]
 
+## Item analyses fork ####
+if (item_analyses == TRUE) {
+  ### save all dfs ####
+  save_all_dfs("./data/data_interrim")
+  rm(list = ls())
 
-# Data Exportation ####
-save_all_dfs("./data/data_interrim")
+  ### Full factor Analyses ####
+  sink("/dev/null")
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/factor_analyses.R"), echo = FALSE)))
+  sink()
 
-# Script Clean-up ####
-rm(list = ls())
+  ### Simple factor Analyses ####
+  sink("/dev/null")
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/factor_analyses_simple.R"), echo = FALSE)))
+  sink()
+
+  ### IRT Analyses ####
+  sink("/dev/null")
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/IRT.R"), echo = FALSE)))
+  sink()
+
+  ### Item Analyses for non-binary items (gedrag_houding & interesse) ####
+  sink("/dev/null")
+  suppressWarnings(suppressMessages(source(paste0("./R/code_extra/item_analyses_personality.R"), echo = FALSE)))
+  sink()
+} else {
+
+  # Data Exportation ####
+  save_all_dfs("./data/data_interrim")
+
+
+  # Script Clean-up ####
+  rm(list = ls())
+}
 
 # File Report ####
