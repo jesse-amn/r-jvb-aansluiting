@@ -23,9 +23,14 @@ Table of Contents:
   # 7. Script Clean-up: Object removal and process terminations
 "
 
-path <- "/Export Results/Export Aansluiting Group 7 - 21.12.2023"
+
 
 load_data <- function(path, output = NULL) {
+  if (is.null(path)) {
+    path <- "/Export Results/Export Aansluiting Group 7 - 21.12.2023"
+  } else if (!exists("path")) {
+    path <- "/Export Results/Export Aansluiting Group 7 - 21.12.2023"
+  }
   # Environment Set-up ####
   ## General ####
   library(here)
@@ -77,12 +82,12 @@ load_data <- function(path, output = NULL) {
 
     data <- read.delim(df, header = TRUE, sep = "\t")
 
-    assign(name, data, envir = .GlobalEnv)
+    assign(name, data)
     rm(name, data)
   }
 
   ### Remove temporary files ####
-  rm(file_list, df, path)
+  rm(df, path)
 
 
   # Data Finalization ####
@@ -109,10 +114,10 @@ load_data <- function(path, output = NULL) {
   if (all.equal(colnames(gedrag_houding_leerkracht1), colnames(gedrag_houding_leerkracht2)) == TRUE) {
     # Combine df's
     gedrag_houding_leerkracht <- rbind(gedrag_houding_leerkracht1, gedrag_houding_leerkracht2)
-    assign("gedrag_houding_leerkracht", gedrag_houding_leerkracht, envir = .GlobalEnv)
+    assign("gedrag_houding_leerkracht", gedrag_houding_leerkracht)
 
     # Remove temporary df's
-    rm(gedrag_houding_leerkracht1, gedrag_houding_leerkracht2, envir = .GlobalEnv)
+    rm(gedrag_houding_leerkracht1, gedrag_houding_leerkracht2)
   } else {
     stop("Column names of gedrag_houding_leerkracht1 and gedrag_houding_leerkracht2 are not equal.")
   }
@@ -121,22 +126,28 @@ load_data <- function(path, output = NULL) {
   if (all.equal(colnames(gedrag_houding_ouder_1), colnames(gedrag_houding_ouder_2)) == TRUE) {
     # Combine df's
     gedrag_houding_ouder <- rbind(gedrag_houding_ouder_1, gedrag_houding_ouder_2)
-    assign("gedrag_houding_ouder", gedrag_houding_ouder, envir = .GlobalEnv)
+    assign("gedrag_houding_ouder", gedrag_houding_ouder)
 
     # Remove temporary df's
-    rm(gedrag_houding_ouder_1, gedrag_houding_ouder_2, envir = .GlobalEnv)
+    rm(gedrag_houding_ouder_1, gedrag_houding_ouder_2)
   } else {
     stop("Column names of gedrag_houding_ouder_1 and gedrag_houding_ouder_2 are not equal.")
   }
 
 
   # Data Exportation ####
-  assign("meta_file", meta_file, envir = .GlobalEnv)
-  save_all_dfs("./data/data_input")
+  ## Save  files ####
+  ### Get the names of all dfs in the environment ####
+  df_names <- ls()[sapply(ls(), function(x) is.data.frame(get(x)))]
+  for (name in df_names) {
+    ### get df ####
+    local_df <- get(name)
+
+    ### Save df's ####
+    write_csv(local_df, paste0("./data/data_input/", name, ".csv"))
+  }
 
 
   # Script Clean-up ####
-  rm(list = ls(envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls())
 }
-
-load_data(path = path)
