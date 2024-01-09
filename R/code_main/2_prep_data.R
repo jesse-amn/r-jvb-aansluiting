@@ -93,12 +93,33 @@ for (name in basename(file_list) %>% gsub(".csv", "", .)) {
 }
 rm(name, df)
 
-# NA was used for wrong. Replace with 0
-woordenrelateren[is.na(woordenrelateren)] <- 0
-sommenmaken$ASL_sommenmaken_012_NEW[is.na(sommenmaken$ASL_sommenmaken_012_NEW)] <- 0
+
+# Get cap_files
+cap_files <- basename(file_list) %>% gsub(".csv", "", .)
+cap_files <- cap_files[!grepl("gedrag_houding|interesse", cap_files)]
+
+# itereate and replace NA's with 0's
+for (name in cap_files) {
+  df <- get(name)
+
+  # Replace NA's with 0's in most columns
+  cols_to_exclude <- c("gender", "student_number", "student_name", "birth_date")
+  if (any(grepl("package_duration_raw", colnames(df)))) {
+    cols_to_exclude <- c(cols_to_exclude, "package_duration_raw")
+  }
+
+  df <- df %>%
+    mutate_at(vars(-one_of(cols_to_exclude)), ~ ifelse(is.na(.), 0, .))
+  # Assign back to global environment
+  assign(name, df, envir = .GlobalEnv)
+
+  print(sum(is.na(df)))
+}
+
 
 # Remove rows of impossible values in metenenmeetkunde
 metenenmeetkunde <- metenenmeetkunde[apply(metenenmeetkunde[, grepl("^ASL", colnames(metenenmeetkunde))], 1, function(x) all(x %in% c(0, 1))), ]
+
 
 '
 colnames(metenenmeetkunde)
@@ -141,12 +162,6 @@ if (item_analyses == TRUE) {
   suppressWarnings(suppressMessages(source(paste0("./R/code_extra/item_analyses_personality.R"), echo = FALSE)))
   sink()
 }
-
-
-
-
-
-
 
 
 
